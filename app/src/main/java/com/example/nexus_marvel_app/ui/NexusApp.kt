@@ -14,7 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.nexus_marvel_app.ui.theme.nexusBackground
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -54,7 +56,8 @@ fun NexusApp() {
 
     CompositionLocalProvider(LocalFavorites provides favoritesViewModel) {
         Scaffold(
-            containerColor = NexusColors.Background,
+            modifier = Modifier.fillMaxSize().nexusBackground(),
+            containerColor = Color.Transparent,
             bottomBar = {
                 if (showBottomBar) {
                     Box(modifier = Modifier.navigationBarsPadding().padding(bottom = 8.dp)) {

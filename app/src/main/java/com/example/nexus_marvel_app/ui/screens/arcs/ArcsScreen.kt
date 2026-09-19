@@ -68,7 +68,7 @@ fun ArcsScreen(contentPadding: PaddingValues, onArcClick: (Int) -> Unit) {
         Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.CenterStart) {
             when {
                 state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = NexusColors.Red)
+                    CircularProgressIndicator(color = NexusColors.Gold)
                 }
                 state.error != null -> ErrorState(message = state.error!!, onRetry = vm::load)
                 state.arcs.isEmpty() -> EmptyState(title = "Sem arcos", message = "Nenhum arco encontrado.")
@@ -112,7 +112,7 @@ private fun Timeline(
                 .align(Alignment.Center)
                 .fillMaxWidth()
                 .height(2.dp)
-                .background(NexusColors.Red.copy(alpha = 0.5f)),
+                .background(NexusColors.Gold.copy(alpha = 0.5f)),
         )
 
         LazyRow(
@@ -127,7 +127,7 @@ private fun Timeline(
             if (loadingMore) {
                 item {
                     Box(modifier = Modifier.width(80.dp).height(CARD_HEIGHT), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = NexusColors.Red)
+                        CircularProgressIndicator(color = NexusColors.Gold)
                     }
                 }
             }

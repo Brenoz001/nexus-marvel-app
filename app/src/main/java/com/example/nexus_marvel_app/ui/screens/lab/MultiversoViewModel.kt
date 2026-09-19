@@ -53,7 +53,7 @@ class MultiversoViewModel(private val repo: ComicVineRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 val page = repo.getCharacters(query = query, offset = 0, limit = 40)
-                val variants = page.items.filter { it.isMarvel }
+                val variants = page.items.filter { it.isMarvelOrUnknown }
                 _uiState.update { it.copy(loading = false, variants = variants, error = null) }
             } catch (e: ComicVineException) {
                 _uiState.update { it.copy(loading = false, error = e.message) }

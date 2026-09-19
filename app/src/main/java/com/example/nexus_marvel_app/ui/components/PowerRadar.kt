@@ -30,7 +30,7 @@ import kotlin.math.sin
 fun PowerRadar(
     scores: Map<PowerCategory, Int>,
     modifier: Modifier = Modifier,
-    color: Color = NexusColors.Red,
+    color: Color = NexusColors.Gold,
     maxValue: Int = 10,
 ) {
     val measurer = rememberTextMeasurer()

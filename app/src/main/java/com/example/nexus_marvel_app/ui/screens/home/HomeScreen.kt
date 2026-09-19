@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +53,7 @@ import com.example.nexus_marvel_app.ui.theme.BebasNeue
 import com.example.nexus_marvel_app.ui.theme.NexusColors
 import com.example.nexus_marvel_app.ui.theme.Radius
 import com.example.nexus_marvel_app.ui.theme.Spacing
+import com.example.nexus_marvel_app.ui.theme.nexusBackground
 import com.example.nexus_marvel_app.ui.theme.teamColor
 
 private const val NODE_SIZE = 56f
@@ -60,7 +63,7 @@ fun HomeScreen(contentPadding: PaddingValues, onCharacterClick: (Int) -> Unit) {
     val vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory)
     val state by vm.uiState.collectAsStateWithLifecycle()
 
-    Box(modifier = Modifier.fillMaxSize().background(NexusColors.Background)) {
+    Box(modifier = Modifier.fillMaxSize().nexusBackground()) {
         StarField(modifier = Modifier.fillMaxSize())
 
         when {
@@ -73,7 +76,7 @@ fun HomeScreen(contentPadding: PaddingValues, onCharacterClick: (Int) -> Unit) {
             )
         }
 
-        // Title
+        // Masthead
         Column(
             modifier = Modifier
                 .statusBarsPadding()
@@ -82,14 +85,27 @@ fun HomeScreen(contentPadding: PaddingValues, onCharacterClick: (Int) -> Unit) {
             Text(
                 "NEXUS",
                 fontFamily = BebasNeue,
-                fontSize = 44.sp,
-                letterSpacing = 3.sp,
-                color = NexusColors.RedLight,
+                fontSize = 50.sp,
+                letterSpacing = 8.sp,
+                color = NexusColors.TextPrimary,
+            )
+            Box(
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .fillMaxWidth(0.44f)
+                    .height(2.dp)
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(NexusColors.Gold, NexusColors.Gold.copy(alpha = 0f))
+                        )
+                    ),
             )
             Text(
                 "Every hero is connected.",
-                color = NexusColors.TextSecondary,
-                fontSize = 13.sp,
+                color = NexusColors.GoldSoft,
+                fontSize = 12.sp,
+                letterSpacing = 0.6.sp,
+                modifier = Modifier.padding(top = 10.dp),
             )
         }
     }
@@ -102,7 +118,7 @@ private fun LoadingState() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        CircularProgressIndicator(color = NexusColors.Red)
+        CircularProgressIndicator(color = NexusColors.Gold)
         Text(
             "Mapeando o universo…",
             color = NexusColors.TextSecondary,

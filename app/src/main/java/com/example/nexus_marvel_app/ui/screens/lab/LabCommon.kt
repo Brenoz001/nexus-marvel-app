@@ -26,6 +26,7 @@ import com.example.nexus_marvel_app.ui.components.NexusBackButton
 import com.example.nexus_marvel_app.ui.theme.BebasNeue
 import com.example.nexus_marvel_app.ui.theme.NexusColors
 import com.example.nexus_marvel_app.ui.theme.Spacing
+import com.example.nexus_marvel_app.ui.theme.nexusBackground
 
 /** Standard chrome for a Lab feature screen: dark background, back button, title. */
 @Composable
@@ -35,7 +36,7 @@ fun LabScaffold(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    Box(modifier = modifier.fillMaxSize().background(NexusColors.Background)) {
+    Box(modifier = modifier.fillMaxSize().nexusBackground()) {
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(Spacing.md),

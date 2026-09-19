@@ -22,6 +22,13 @@ data class Character(
 ) {
     val isMarvel: Boolean get() = publisherName?.contains("marvel", ignoreCase = true) == true
 
+    /**
+     * Lenient check for browsing: the list endpoint often omits `publisher`, so
+     * keep entries whose publisher is unknown and only drop confirmed non-Marvel.
+     */
+    val isMarvelOrUnknown: Boolean
+        get() = publisherName.isNullOrBlank() || isMarvel
+
     /** Year parsed from the first appearance issue name, if present. */
     val firstYear: String?
         get() = firstAppearance?.let { Regex("(19|20)\\d{2}").find(it)?.value }
@@ -38,6 +45,7 @@ data class Team(
     val appearances: Int?,
 ) {
     val isMarvel: Boolean get() = publisherName?.contains("marvel", ignoreCase = true) == true
+    val isMarvelOrUnknown: Boolean get() = publisherName.isNullOrBlank() || isMarvel
 }
 
 data class StoryArc(

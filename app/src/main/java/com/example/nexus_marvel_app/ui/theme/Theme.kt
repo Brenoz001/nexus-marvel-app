@@ -7,9 +7,9 @@ import androidx.compose.runtime.Composable
 
 /** Always-dark scheme derived from the NEXUS palette. */
 private val NexusColorScheme = darkColorScheme(
-    primary = NexusColors.Red,
-    onPrimary = NexusColors.White,
-    secondary = NexusColors.Gold,
+    primary = NexusColors.Gold,
+    onPrimary = NexusColors.Black,
+    secondary = NexusColors.GoldSoft,
     onSecondary = NexusColors.Black,
     tertiary = NexusColors.Info,
     background = NexusColors.Background,

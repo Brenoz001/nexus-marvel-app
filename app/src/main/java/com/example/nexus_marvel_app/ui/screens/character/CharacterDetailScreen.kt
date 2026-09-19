@@ -58,6 +58,7 @@ import com.example.nexus_marvel_app.ui.theme.JetBrainsMono
 import com.example.nexus_marvel_app.ui.theme.NexusColors
 import com.example.nexus_marvel_app.ui.theme.Radius
 import com.example.nexus_marvel_app.ui.theme.Spacing
+import com.example.nexus_marvel_app.ui.theme.nexusBackground
 import com.example.nexus_marvel_app.ui.theme.teamColor
 import com.example.nexus_marvel_app.util.Soundtrack
 import com.example.nexus_marvel_app.util.Soundtracks
@@ -80,7 +81,7 @@ fun CharacterDetailScreen(
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val heroHeight = screenWidth * 1.15f
 
-    Box(modifier = Modifier.fillMaxSize().background(NexusColors.Background)) {
+    Box(modifier = Modifier.fillMaxSize().nexusBackground()) {
         when {
             state.error != null -> ErrorState(message = state.error!!, onRetry = vm::load)
             else -> Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {

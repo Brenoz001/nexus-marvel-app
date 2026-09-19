@@ -23,16 +23,16 @@ fun NexusFilterChip(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    color: Color = NexusColors.Red,
+    color: Color = NexusColors.Gold,
 ) {
-    val bg = if (selected) color.copy(alpha = 0.2f) else NexusColors.Surface
-    val borderColor = if (selected) color.copy(alpha = 0.5f) else NexusColors.Border
+    val bg = if (selected) color.copy(alpha = 0.18f) else NexusColors.Surface.copy(alpha = 0.6f)
+    val borderColor = if (selected) color.copy(alpha = 0.55f) else NexusColors.Border
     Text(
-        text = label.uppercase(),
+        text = label,
         color = if (selected) NexusColors.TextPrimary else NexusColors.TextSecondary,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 12.sp,
-        letterSpacing = 0.4.sp,
+        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+        fontSize = 13.sp,
+        letterSpacing = 0.2.sp,
         modifier = modifier
             .clip(RoundedCornerShape(Radius.full))
             .background(bg)

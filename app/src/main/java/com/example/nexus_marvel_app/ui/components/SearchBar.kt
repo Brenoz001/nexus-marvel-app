@@ -62,7 +62,7 @@ fun NexusSearchBar(
                 onValueChange = onValueChange,
                 singleLine = true,
                 textStyle = textStyle,
-                cursorBrush = SolidColor(NexusColors.Red),
+                cursorBrush = SolidColor(NexusColors.Gold),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 modifier = Modifier.fillMaxWidth(),
                 decorationBox = { inner ->

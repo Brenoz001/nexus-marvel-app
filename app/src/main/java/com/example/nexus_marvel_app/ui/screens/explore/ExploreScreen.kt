@@ -219,7 +219,7 @@ private fun LoadingRow() {
         modifier = Modifier.fillMaxWidth().padding(Spacing.lg),
         contentAlignment = Alignment.Center,
     ) {
-        CircularProgressIndicator(color = NexusColors.Red)
+        CircularProgressIndicator(color = NexusColors.Gold)
     }
 }
 

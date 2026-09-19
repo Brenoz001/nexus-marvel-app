@@ -47,8 +47,8 @@ fun NexusBottomBar(
             .fillMaxWidth()
             .padding(horizontal = Spacing.md)
             .clip(RoundedCornerShape(Radius.xl))
-            .background(NexusColors.Surface.copy(alpha = 0.96f))
-            .border(1.dp, NexusColors.BorderStrong, RoundedCornerShape(Radius.xl))
+            .background(NexusColors.Surface.copy(alpha = 0.94f))
+            .border(1.dp, NexusColors.GoldBorder, RoundedCornerShape(Radius.xl))
             .padding(vertical = Spacing.sm, horizontal = Spacing.xs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -93,12 +93,12 @@ private fun TabButton(
                 .width(44.dp)
                 .height(32.dp)
                 .clip(RoundedCornerShape(Radius.md))
-                .background(if (selected) NexusColors.Red.copy(alpha = 0.14f) else NexusColors.Surface.copy(alpha = 0f)),
+                .background(if (selected) NexusColors.Gold.copy(alpha = 0.16f) else NexusColors.Surface.copy(alpha = 0f)),
         ) {
             Icon(
                 imageVector = if (selected) tab.iconFilled else tab.iconOutlined,
                 contentDescription = tab.label,
-                tint = if (selected) NexusColors.RedLight else NexusColors.TextMuted,
+                tint = if (selected) NexusColors.Gold else NexusColors.TextMuted,
                 modifier = Modifier.size(22.dp),
             )
         }

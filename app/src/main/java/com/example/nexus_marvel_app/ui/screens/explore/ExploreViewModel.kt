@@ -155,7 +155,7 @@ class ExploreViewModel(private val repo: ComicVineRepository) : ViewModel() {
         return when (filter.mode) {
             ExploreMode.TEAMS -> {
                 val page = repo.getTeams(offset)
-                val filtered = page.items.filter { it.isMarvel }
+                val filtered = page.items.filter { it.isMarvelOrUnknown }
                 Triple(filtered, page.total, page.items.size)
             }
             ExploreMode.POWERS -> {
@@ -165,7 +165,7 @@ class ExploreViewModel(private val repo: ComicVineRepository) : ViewModel() {
             ExploreMode.CHARACTERS -> {
                 val page = repo.getCharacters(query, offset)
                 val filtered = page.items
-                    .filter { it.isMarvel }
+                    .filter { it.isMarvelOrUnknown }
                     .filter { c -> matchesAlignment(c, filter) }
                 Triple(filtered, page.total, page.items.size)
             }

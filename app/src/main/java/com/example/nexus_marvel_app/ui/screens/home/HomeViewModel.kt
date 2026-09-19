@@ -57,7 +57,7 @@ class HomeViewModel(private val repo: ComicVineRepository) : ViewModel() {
             try {
                 // Top Marvel characters by appearances, then a few pages to gather ~30.
                 val page = repo.getCharacters(query = "", offset = 0, limit = 40)
-                val chars = page.items.filter { it.isMarvel }.take(30)
+                val chars = page.items.filter { it.isMarvelOrUnknown }.take(30)
                 _uiState.update { it.copy(loading = false, graph = buildGraph(chars), error = null) }
             } catch (e: ComicVineException) {
                 _uiState.update { it.copy(loading = false, error = e.message) }
