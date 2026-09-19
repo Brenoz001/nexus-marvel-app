@@ -66,5 +66,5 @@ util/              MarvelFilter, PowerCategories (radar), Soundtracks
 - [x] **Etapa 4** — Home: grafo de constelações interativo (pan/zoom/tap/duplo-toque, nós conectados por time, fundo de estrelas)
 - [x] **Etapa 5** — Arcos épicos: timeline horizontal com cards largos e linha do tempo
 - [x] **Etapa 6** — Laboratório: Confronto (radar duplo), Multiverso (variantes), Sentido Aranha (shake/acelerômetro) e Efeito Thanos (snap)
-- [ ] Etapa 7 — Polish (animações, haptics, transições)
-- [ ] Etapa 8 — Splash + ícone finais
+- [x] **Etapa 7** — Polish: animações (Reanimated-equivalente do Compose), haptics, transições de tela, skeletons, pull-to-refresh
+- [x] **Etapa 8** — Ícone NEXUS (fundo vermelho + "N") e splash escuro com o "N"
