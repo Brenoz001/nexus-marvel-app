@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme (always dark, no white flash before Compose renders). -->
-    <style name="Base.Theme.Nexusmarvelapp" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Base application theme (always dark, no white flash before Compose renders).
+         Framework theme so we don't depend on Material Components (app is 100% Compose). -->
+    <style name="Base.Theme.Nexusmarvelapp" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/nexus_background</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
