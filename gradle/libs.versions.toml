@@ -1,7 +1,8 @@
 [versions]
 agp = "9.0.1"
-# Deve casar com o Kotlin embutido do AGP 9 (KGP 2.2.10). Usado pelo plugin do Compose.
-kotlin = "2.2.10"
+# Kotlin embutido do AGP 9 subido para 2.4.20 (ver buildscript no build.gradle.kts raiz),
+# para casar com as libs compiladas com Kotlin 2.4. Usado tambem pelo plugin do Compose.
+kotlin = "2.4.20"
 coreKtx = "1.17.0"
 lifecycle = "2.9.4"
 activityCompose = "1.13.0"
