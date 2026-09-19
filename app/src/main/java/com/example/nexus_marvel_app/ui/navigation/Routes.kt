@@ -20,6 +20,12 @@ object Routes {
     const val TEAM = "team/{id}"
     const val ARC = "arc/{id}"
 
+    // Laboratório
+    const val LAB_CONFRONTO = "lab/confronto"
+    const val LAB_MULTIVERSO = "lab/multiverso"
+    const val LAB_SPIDER = "lab/spider"
+    const val LAB_SNAP = "lab/snap"
+
     fun character(id: Int) = "character/$id"
     fun team(id: Int) = "team/$id"
     fun arc(id: Int) = "arc/$id"

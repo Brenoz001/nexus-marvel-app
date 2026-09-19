@@ -65,6 +65,6 @@ util/              MarvelFilter, PowerCategories (radar), Soundtracks
 - [x] **Etapa 3** — Detalhe completo do personagem (radar de poderes DNA, trilha sonora, conexões aliados/inimigos, times)
 - [x] **Etapa 4** — Home: grafo de constelações interativo (pan/zoom/tap/duplo-toque, nós conectados por time, fundo de estrelas)
 - [x] **Etapa 5** — Arcos épicos: timeline horizontal com cards largos e linha do tempo
-- [ ] Etapa 6 — Laboratório (Confronto, Multiverso, Sentido Aranha, Snap)
-- [ ] Etapa 7 — Polish (animações, haptics)
+- [x] **Etapa 6** — Laboratório: Confronto (radar duplo), Multiverso (variantes), Sentido Aranha (shake/acelerômetro) e Efeito Thanos (snap)
+- [ ] Etapa 7 — Polish (animações, haptics, transições)
 - [ ] Etapa 8 — Splash + ícone finais

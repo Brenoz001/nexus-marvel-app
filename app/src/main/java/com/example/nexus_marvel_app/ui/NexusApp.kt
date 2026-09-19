@@ -34,6 +34,10 @@ import com.example.nexus_marvel_app.ui.screens.character.CharacterDetailScreen
 import com.example.nexus_marvel_app.ui.screens.explore.ExploreScreen
 import com.example.nexus_marvel_app.ui.screens.home.HomeScreen
 import com.example.nexus_marvel_app.ui.screens.lab.LabScreen
+import com.example.nexus_marvel_app.ui.screens.lab.ConfrontoScreen
+import com.example.nexus_marvel_app.ui.screens.lab.MultiversoScreen
+import com.example.nexus_marvel_app.ui.screens.lab.SnapScreen
+import com.example.nexus_marvel_app.ui.screens.lab.SpiderSenseScreen
 import com.example.nexus_marvel_app.ui.screens.team.TeamDetailScreen
 import com.example.nexus_marvel_app.ui.theme.NexusColors
 
@@ -94,7 +98,27 @@ fun NexusApp() {
                         onArcClick = { navController.navigate(Routes.arc(it)) },
                     )
                 }
-                composable(Routes.LAB) { LabScreen(innerPadding) }
+                composable(Routes.LAB) {
+                    LabScreen(contentPadding = innerPadding, onOpen = { navController.navigate(it) })
+                }
+                composable(Routes.LAB_CONFRONTO) {
+                    ConfrontoScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Routes.LAB_MULTIVERSO) {
+                    MultiversoScreen(
+                        onBack = { navController.popBackStack() },
+                        onCharacterClick = { navController.navigate(Routes.character(it)) },
+                    )
+                }
+                composable(Routes.LAB_SPIDER) {
+                    SpiderSenseScreen(
+                        onBack = { navController.popBackStack() },
+                        onCharacterClick = { navController.navigate(Routes.character(it)) },
+                    )
+                }
+                composable(Routes.LAB_SNAP) {
+                    SnapScreen(onBack = { navController.popBackStack() })
+                }
 
                 composable(
                     route = Routes.CHARACTER,
