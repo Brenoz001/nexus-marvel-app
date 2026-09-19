@@ -63,7 +63,7 @@ util/              MarvelFilter, PowerCategories (radar), Soundtracks
 - [x] **Etapa 1** — Base (tema, rede, repositório, favoritos, navegação, componentes)
 - [x] **Etapa 2** — Tela Explorar (busca com debounce, filtros, grid infinito, favoritar)
 - [x] **Etapa 3** — Detalhe completo do personagem (radar de poderes DNA, trilha sonora, conexões aliados/inimigos, times)
-- [ ] Etapa 4 — Home (grafo de constelações)
+- [x] **Etapa 4** — Home: grafo de constelações interativo (pan/zoom/tap/duplo-toque, nós conectados por time, fundo de estrelas)
 - [ ] Etapa 5 — Arcos épicos (timeline)
 - [ ] Etapa 6 — Laboratório (Confronto, Multiverso, Sentido Aranha, Snap)
 - [ ] Etapa 7 — Polish (animações, haptics)

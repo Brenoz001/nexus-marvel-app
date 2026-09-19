@@ -75,7 +75,12 @@ fun NexusApp() {
                 enterTransition = { fadeIn(tween(250)) },
                 exitTransition = { fadeOut(tween(250)) },
             ) {
-                composable(Routes.HOME) { HomeScreen(innerPadding) }
+                composable(Routes.HOME) {
+                    HomeScreen(
+                        contentPadding = innerPadding,
+                        onCharacterClick = { navController.navigate(Routes.character(it)) },
+                    )
+                }
                 composable(Routes.EXPLORE) {
                     ExploreScreen(
                         contentPadding = innerPadding,
