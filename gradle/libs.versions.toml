@@ -1,5 +1,5 @@
 [versions]
-agp = "9.0.1"
+agp = "9.4.1"
 # Kotlin embutido do AGP 9 subido para 2.4.20 (ver buildscript no build.gradle.kts raiz),
 # para casar com as libs compiladas com Kotlin 2.4. Usado tambem pelo plugin do Compose.
 kotlin = "2.4.20"

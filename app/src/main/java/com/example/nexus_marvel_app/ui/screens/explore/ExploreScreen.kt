@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
@@ -209,7 +208,7 @@ private fun LoadingContent(isPowers: Boolean, bottomPad: Dp) {
             userScrollEnabled = false,
             modifier = Modifier.fillMaxSize(),
         ) {
-            gridItems(8) { SkeletonBox(modifier = Modifier.fillMaxWidth().aspectRatio(3f / 4f)) }
+            items(8) { SkeletonBox(modifier = Modifier.fillMaxWidth().aspectRatio(3f / 4f)) }
         }
     }
 }

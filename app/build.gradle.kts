@@ -15,7 +15,7 @@ val comicVineApiKey: String = localProps.getProperty("COMIC_VINE_API_KEY", "")
 android {
     namespace = "com.example.nexus_marvel_app"
     compileSdk {
-        version = release(36)
+        version = release(37)
     }
 
     defaultConfig {
