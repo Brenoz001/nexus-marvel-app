@@ -30,7 +30,7 @@ object ComicVineClient {
 
         val client = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor())
-            .addInterceptor(RateLimitInterceptor(minIntervalMs = 1000))
+            .addInterceptor(RateLimitInterceptor(minIntervalMs = 350))
             .addInterceptor(logging)
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(15, TimeUnit.SECONDS)

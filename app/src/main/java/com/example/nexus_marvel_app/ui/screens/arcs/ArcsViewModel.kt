@@ -37,17 +37,11 @@ class ArcsViewModel(private val repo: ComicVineRepository) : ViewModel() {
         _uiState.update { it.copy(loading = true, error = null, arcs = emptyList()) }
         viewModelScope.launch {
             try {
-                val page = repo.getStoryArcs(offset = 0)
-                serverOffset = page.items.size
-                serverTotal = page.total
-                val arcs = page.items.filter { it.isMarvel }
+                // Curated greatest Marvel arcs; fall back to the API list if empty.
+                val featured = repo.getFeaturedArcs()
+                val arcs = if (featured.isNotEmpty()) featured else repo.getStoryArcs(offset = 0).items.filter { it.isMarvel }
                 _uiState.update {
-                    it.copy(
-                        loading = false,
-                        arcs = arcs,
-                        error = null,
-                        hasMore = serverOffset < serverTotal && page.items.isNotEmpty(),
-                    )
+                    it.copy(loading = false, arcs = arcs, error = null, hasMore = false)
                 }
             } catch (e: ComicVineException) {
                 _uiState.update { it.copy(loading = false, error = e.message) }

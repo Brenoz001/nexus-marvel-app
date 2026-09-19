@@ -141,13 +141,21 @@ fun NexusApp() {
                     route = Routes.TEAM,
                     arguments = listOf(navArgument("id") { type = NavType.IntType }),
                 ) { entry ->
-                    TeamDetailScreen(teamId = entry.arguments?.getInt("id") ?: 0, onBack = { navController.popBackStack() })
+                    TeamDetailScreen(
+                        teamId = entry.arguments?.getInt("id") ?: 0,
+                        onBack = { navController.popBackStack() },
+                        onCharacterClick = { navController.navigate(Routes.character(it)) },
+                    )
                 }
                 composable(
                     route = Routes.ARC,
                     arguments = listOf(navArgument("id") { type = NavType.IntType }),
                 ) { entry ->
-                    ArcDetailScreen(arcId = entry.arguments?.getInt("id") ?: 0, onBack = { navController.popBackStack() })
+                    ArcDetailScreen(
+                        arcId = entry.arguments?.getInt("id") ?: 0,
+                        onBack = { navController.popBackStack() },
+                        onCharacterClick = { navController.navigate(Routes.character(it)) },
+                    )
                 }
             }
         }

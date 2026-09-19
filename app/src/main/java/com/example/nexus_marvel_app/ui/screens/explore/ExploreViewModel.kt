@@ -165,11 +165,17 @@ class ExploreViewModel(private val repo: ComicVineRepository) : ViewModel() {
                 Triple(page.items, page.total, page.items.size)
             }
             ExploreMode.CHARACTERS -> {
-                val page = repo.getCharacters(query, offset)
-                val aligned = page.items.filter { c -> matchesAlignment(c, filter) }
-                val marvel = aligned.filter { it.isMarvelOrUnknown }
-                val filtered = if (marvel.isEmpty()) aligned else marvel
-                Triple(filtered, page.total, page.items.size)
+                // Blank browse shows the curated icons; typing searches the full API.
+                val featured = if (query.isBlank() && offset == 0) repo.getFeaturedCharacters() else emptyList()
+                if (featured.isNotEmpty()) {
+                    val aligned = featured.filter { c -> matchesAlignment(c, filter) }
+                    Triple(aligned, aligned.size, aligned.size)
+                } else {
+                    val page = repo.getCharacters(query, offset)
+                    val aligned = page.items.filter { c -> matchesAlignment(c, filter) }
+                    val marvel = aligned.filter { it.isMarvelOrUnknown }
+                    Triple(if (marvel.isEmpty()) aligned else marvel, page.total, page.items.size)
+                }
             }
         }
     }

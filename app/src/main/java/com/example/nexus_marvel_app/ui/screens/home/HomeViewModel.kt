@@ -55,10 +55,15 @@ class HomeViewModel(private val repo: ComicVineRepository) : ViewModel() {
         _uiState.update { it.copy(loading = true, error = null) }
         viewModelScope.launch {
             try {
-                // Top Marvel characters by appearances, then a few pages to gather ~30.
-                val page = repo.getCharacters(query = "", offset = 0, limit = 40)
-                val marvel = page.items.filter { it.isMarvelOrUnknown }
-                val chars = (if (marvel.isEmpty()) page.items else marvel).take(30)
+                // Curated iconic Marvel characters (the default list is obscure).
+                val featured = repo.getFeaturedCharacters()
+                val chars = if (featured.isNotEmpty()) {
+                    featured.take(30)
+                } else {
+                    val page = repo.getCharacters(query = "", offset = 0, limit = 40)
+                    val marvel = page.items.filter { it.isMarvelOrUnknown }
+                    (if (marvel.isEmpty()) page.items else marvel).take(30)
+                }
                 _uiState.update { it.copy(loading = false, graph = buildGraph(chars), error = null) }
             } catch (e: ComicVineException) {
                 _uiState.update { it.copy(loading = false, error = e.message) }

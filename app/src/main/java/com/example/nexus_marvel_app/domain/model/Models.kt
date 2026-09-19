@@ -43,6 +43,7 @@ data class Team(
     val publisherName: String?,
     val memberCount: Int?,
     val appearances: Int?,
+    val members: List<NamedRef> = emptyList(),
 ) {
     val isMarvel: Boolean get() = publisherName?.contains("marvel", ignoreCase = true) == true
     val isMarvelOrUnknown: Boolean get() = publisherName.isNullOrBlank() || isMarvel
@@ -57,8 +58,11 @@ data class StoryArc(
     val publisherName: String?,
     val appearances: Int?,
     val firstAppearance: String?,
+    val characters: List<NamedRef> = emptyList(),
 ) {
     val isMarvel: Boolean get() = publisherName?.contains("marvel", ignoreCase = true) == true
+    val isMarvelOrUnknown: Boolean get() = publisherName.isNullOrBlank() || isMarvel
+    val firstYear: String? get() = firstAppearance?.let { Regex("(19|20)\\d{2}").find(it)?.value }
 }
 
 data class Power(

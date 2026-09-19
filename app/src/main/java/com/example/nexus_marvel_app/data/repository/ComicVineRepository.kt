@@ -78,6 +78,51 @@ class ComicVineRepository(
             Page(response.results.orEmpty().map { it.toDomain() }, response.totalResults, offset)
         }
 
+    suspend fun getStoryArc(id: Int): StoryArc =
+        call("arc:$id") {
+            val response = api.getStoryArc("${ComicVineApi.PREFIX_STORY_ARC}-$id", ARC_DETAIL_FIELDS)
+            response.results?.toDomain() ?: throw ComicVineException("Arco não encontrado.")
+        }
+
+    suspend fun getTeam(id: Int): Team =
+        call("team:$id") {
+            val response = api.getTeam("${ComicVineApi.PREFIX_TEAM}-$id", TEAM_FIELDS)
+            response.results?.toDomain() ?: throw ComicVineException("Time não encontrado.")
+        }
+
+    /**
+     * Curated list of iconic Marvel characters, fetched by name (the default list
+     * endpoint returns obscure entries and cannot sort by popularity). Cached.
+     */
+    suspend fun getFeaturedCharacters(): List<Character> =
+        call("featured_characters") {
+            val out = mutableListOf<Character>()
+            val seen = mutableSetOf<Int>()
+            for (name in FEATURED_CHARACTER_NAMES) {
+                try {
+                    val resp = api.getCharacters(limit = 1, offset = 0, filter = "name:$name", fieldList = CHARACTER_FIELDS)
+                    val c = resp.results?.firstOrNull()?.toDomain()
+                    if (c != null && seen.add(c.id)) out.add(c)
+                } catch (_: Exception) { /* skip a missing pick, keep the rest */ }
+            }
+            out
+        }
+
+    /** Curated list of the greatest Marvel story arcs, fetched by name. Cached. */
+    suspend fun getFeaturedArcs(): List<StoryArc> =
+        call("featured_arcs") {
+            val out = mutableListOf<StoryArc>()
+            val seen = mutableSetOf<Int>()
+            for (name in FEATURED_ARC_NAMES) {
+                try {
+                    val resp = api.getStoryArcs(limit = 1, offset = 0, filter = "name:$name", fieldList = ARC_FIELDS)
+                    val a = resp.results?.firstOrNull()?.toDomain()
+                    if (a != null && seen.add(a.id)) out.add(a)
+                } catch (_: Exception) { /* skip */ }
+            }
+            out
+        }
+
     /** Runs [block] off the main thread, with caching and normalized errors. */
     private suspend fun <T : Any> call(key: String, block: suspend () -> T): T =
         withContext(Dispatchers.IO) {
@@ -117,6 +162,24 @@ class ComicVineRepository(
             "id,name,deck,image,publisher,count_of_issue_appearances,count_of_team_members,characters"
         private const val ARC_FIELDS =
             "id,name,deck,image,publisher,count_of_issue_appearances,first_appeared_in_issue"
+        private const val ARC_DETAIL_FIELDS =
+            "id,name,deck,description,image,publisher,count_of_issue_appearances,first_appeared_in_issue,characters"
         private const val POWER_FIELDS = "id,name,description,characters"
+
+        /** Iconic Marvel characters featured on the Home graph, Explore and the Lab. */
+        private val FEATURED_CHARACTER_NAMES = listOf(
+            "Spider-Man", "Iron Man", "Captain America", "Thor", "Hulk", "Wolverine",
+            "Black Panther", "Doctor Strange", "Scarlet Witch", "Black Widow", "Deadpool",
+            "Storm", "Magneto", "Loki", "Thanos", "Venom", "Captain Marvel", "Star-Lord",
+            "Vision", "Daredevil", "Silver Surfer", "Ghost Rider",
+        )
+
+        /** The greatest Marvel story arcs, featured on the Arcs timeline. */
+        private val FEATURED_ARC_NAMES = listOf(
+            "The Infinity Gauntlet", "Civil War", "Secret Wars", "Days of Future Past",
+            "The Dark Phoenix Saga", "House of M", "Planet Hulk", "World War Hulk",
+            "Annihilation", "Secret Invasion", "Old Man Logan", "Avengers vs. X-Men",
+            "Kraven's Last Hunt", "Born Again",
+        )
     }
 }

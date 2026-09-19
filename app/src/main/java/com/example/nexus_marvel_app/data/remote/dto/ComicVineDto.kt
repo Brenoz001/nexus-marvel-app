@@ -68,6 +68,7 @@ data class StoryArcDto(
     @SerializedName("publisher") val publisher: RefDto? = null,
     @SerializedName("count_of_issue_appearances") val appearances: Int? = null,
     @SerializedName("first_appeared_in_issue") val firstAppearance: IssueRefDto? = null,
+    @SerializedName("characters") val characters: List<RefDto>? = null,
 )
 
 data class PowerDto(

@@ -43,6 +43,7 @@ fun TeamDto.toDomain(): Team = Team(
     publisherName = publisher?.name,
     memberCount = memberCount ?: characters?.size,
     appearances = appearances,
+    members = characters.toRefs(),
 )
 
 fun StoryArcDto.toDomain(): StoryArc = StoryArc(
@@ -54,6 +55,7 @@ fun StoryArcDto.toDomain(): StoryArc = StoryArc(
     publisherName = publisher?.name,
     appearances = appearances,
     firstAppearance = firstAppearance?.name,
+    characters = characters.toRefs(),
 )
 
 fun PowerDto.toDomain(): Power = Power(
