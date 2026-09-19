@@ -1,7 +1,13 @@
 package com.example.nexus_marvel_app.ui.screens.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -138,6 +144,14 @@ private fun ConstellationGraph(
     var offset by remember { mutableStateOf(Offset.Zero) }
     var selected by remember { mutableStateOf<Int?>(null) }
 
+    // Energy pulse travelling along each connection line.
+    val flow by rememberInfiniteTransition(label = "flow").animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(2200, easing = LinearEasing), RepeatMode.Restart),
+        label = "flowT",
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -159,16 +173,31 @@ private fun ConstellationGraph(
                     translationY = offset.y
                 },
         ) {
-            // Edges
+            // Edges + travelling energy pulse
             Canvas(modifier = Modifier.fillMaxSize()) {
-                graph.edges.forEach { e ->
+                graph.edges.forEachIndexed { index, e ->
                     val a = graph.nodes[e.from]
                     val b = graph.nodes[e.to]
+                    val start = Offset(a.x.dp.toPx(), a.y.dp.toPx())
+                    val end = Offset(b.x.dp.toPx(), b.y.dp.toPx())
+                    val color = teamColor(e.team)
                     drawLine(
-                        color = teamColor(e.team).copy(alpha = 0.4f),
-                        start = Offset(a.x.dp.toPx(), a.y.dp.toPx()),
-                        end = Offset(b.x.dp.toPx(), b.y.dp.toPx()),
+                        color = color.copy(alpha = 0.22f),
+                        start = start,
+                        end = end,
                         strokeWidth = 1.5.dp.toPx(),
+                    )
+                    // Stagger each edge's pulse so they don't move in lockstep.
+                    val t = (flow + index * 0.13f) % 1f
+                    val pulse = Offset(
+                        start.x + (end.x - start.x) * t,
+                        start.y + (end.y - start.y) * t,
+                    )
+                    val fade = 1f - kotlin.math.abs(t - 0.5f) * 2f
+                    drawCircle(
+                        color = color.copy(alpha = 0.9f * fade),
+                        radius = 2.5.dp.toPx(),
+                        center = pulse,
                     )
                 }
             }

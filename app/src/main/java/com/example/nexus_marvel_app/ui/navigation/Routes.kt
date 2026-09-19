@@ -25,6 +25,7 @@ object Routes {
     const val LAB_MULTIVERSO = "lab/multiverso"
     const val LAB_SPIDER = "lab/spider"
     const val LAB_SNAP = "lab/snap"
+    const val LAB_JUKEBOX = "lab/jukebox"
 
     fun character(id: Int) = "character/$id"
     fun team(id: Int) = "team/$id"

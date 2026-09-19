@@ -37,6 +37,9 @@ object Soundtracks {
         "Groot" to Soundtrack("Mr. Blue Sky", "Electric Light Orchestra", "Guardians of the Galaxy Vol. 2"),
     )
 
+    /** All tracks as (character, soundtrack) pairs, for the Jukebox. */
+    val all: List<Pair<String, Soundtrack>> = map.entries.map { it.key to it.value }
+
     /** Exact match first, then a loose contains-match. */
     fun forCharacter(name: String?): Soundtrack? {
         if (name.isNullOrBlank()) return null

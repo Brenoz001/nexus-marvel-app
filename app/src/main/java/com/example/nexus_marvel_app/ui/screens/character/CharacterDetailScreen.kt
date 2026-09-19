@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -63,6 +65,8 @@ import com.example.nexus_marvel_app.ui.theme.teamColor
 import com.example.nexus_marvel_app.util.Soundtrack
 import com.example.nexus_marvel_app.util.Soundtracks
 import com.example.nexus_marvel_app.util.computePowerScores
+import com.example.nexus_marvel_app.util.openUrl
+import com.example.nexus_marvel_app.util.youtubeSearchUrl
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -239,6 +243,7 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 
 @Composable
 private fun SoundtrackCard(track: Soundtrack) {
+    val context = LocalContext.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.md),
@@ -247,6 +252,7 @@ private fun SoundtrackCard(track: Soundtrack) {
             .clip(RoundedCornerShape(Radius.md))
             .background(NexusColors.Gold.copy(alpha = 0.08f))
             .border(1.dp, NexusColors.Gold.copy(alpha = 0.25f), RoundedCornerShape(Radius.md))
+            .clickable { openUrl(context, youtubeSearchUrl(track.track, track.artist)) }
             .padding(Spacing.md),
     ) {
         Box(
@@ -258,6 +264,12 @@ private fun SoundtrackCard(track: Soundtrack) {
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(track.track, color = NexusColors.TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text("${track.artist} • ${track.movie}", color = NexusColors.TextSecondary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(36.dp).clip(CircleShape).background(NexusColors.Gold),
+        ) {
+            Icon(Icons.Filled.PlayArrow, contentDescription = "Ouvir no YouTube", tint = NexusColors.Black, modifier = Modifier.size(20.dp))
         }
     }
 }

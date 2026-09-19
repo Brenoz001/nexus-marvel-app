@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BackHand
 import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.QueueMusic
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
@@ -54,6 +55,7 @@ fun LabScreen(contentPadding: PaddingValues, onOpen: (String) -> Unit) {
         LabFeature("Multiverso", "Encontre todas as variantes de um herói.", Icons.Filled.BlurOn, NexusColors.Info, Routes.LAB_MULTIVERSO),
         LabFeature("Sentido Aranha", "Chacoalhe para detectar uma ameaça.", Icons.Filled.Vibration, NexusColors.Gold, Routes.LAB_SPIDER),
         LabFeature("Efeito Thanos", "Estale os dedos. Metade se desfaz.", Icons.Filled.BackHand, NexusColors.Success, Routes.LAB_SNAP),
+        LabFeature("Trilha Sonora", "As músicas mais marcantes dos filmes.", Icons.Filled.QueueMusic, NexusColors.Gold, Routes.LAB_JUKEBOX),
     )
 
     Column(
