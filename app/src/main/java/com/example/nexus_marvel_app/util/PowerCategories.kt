@@ -3,13 +3,13 @@ package com.example.nexus_marvel_app.util
 import com.example.nexus_marvel_app.domain.model.NamedRef
 
 /** The six radar categories used in Confronto / DNA de Poderes. */
-enum class PowerCategory(val label: String) {
-    FORCA("Força"),
-    VELOCIDADE("Velocidade"),
-    INTELIGENCIA("Inteligência"),
-    ENERGIA("Energia"),
-    RESISTENCIA("Resistência"),
-    COMBATE("Habilidade de Combate"),
+enum class PowerCategory(val label: String, val short: String) {
+    FORCA("Força", "Força"),
+    VELOCIDADE("Velocidade", "Veloc."),
+    INTELIGENCIA("Inteligência", "Intel."),
+    ENERGIA("Energia", "Energia"),
+    RESISTENCIA("Resistência", "Resist."),
+    COMBATE("Habilidade de Combate", "Combate"),
 }
 
 const val MAX_POWER_SCORE = 10
