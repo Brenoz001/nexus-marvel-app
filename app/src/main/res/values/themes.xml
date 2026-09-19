@@ -1,0 +1,18 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme (always dark, no white flash before Compose renders). -->
+    <style name="Base.Theme.Nexusmarvelapp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/nexus_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Theme.Nexusmarvelapp" parent="Base.Theme.Nexusmarvelapp" />
+
+    <!-- Splash screen theme shown at cold start. -->
+    <style name="Theme.Nexusmarvelapp.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/nexus_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.Nexusmarvelapp</item>
+    </style>
+</resources>
