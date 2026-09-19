@@ -88,7 +88,12 @@ fun NexusApp() {
                         onTeamClick = { navController.navigate(Routes.team(it)) },
                     )
                 }
-                composable(Routes.ARCS) { ArcsScreen(innerPadding) }
+                composable(Routes.ARCS) {
+                    ArcsScreen(
+                        contentPadding = innerPadding,
+                        onArcClick = { navController.navigate(Routes.arc(it)) },
+                    )
+                }
                 composable(Routes.LAB) { LabScreen(innerPadding) }
 
                 composable(
