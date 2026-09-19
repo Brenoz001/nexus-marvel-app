@@ -15,7 +15,7 @@ val comicVineApiKey: String = localProps.getProperty("COMIC_VINE_API_KEY", "")
 android {
     namespace = "com.example.nexus_marvel_app"
     compileSdk {
-        version = release(37)
+        version = release(36)
     }
 
     defaultConfig {
@@ -82,9 +82,8 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging.interceptor)
 
-    // Image loading
+    // Image loading (Coil 2 — rede via OkHttp embutida)
     implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
 
     // Test
     testImplementation(libs.junit)

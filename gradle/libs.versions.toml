@@ -1,19 +1,23 @@
 [versions]
-agp = "9.4.1"
-# Kotlin embutido do AGP 9 subido para 2.4.20 (ver buildscript no build.gradle.kts raiz),
-# para casar com as libs compiladas com Kotlin 2.4. Usado tambem pelo plugin do Compose.
+# AGP fixado em 9.0.x (versao maxima suportada por esta versao do Android Studio).
+agp = "9.0.1"
+# Compilador Kotlin subido para 2.4.20 via buildscript (build.gradle.kts raiz) para
+# ler o metadata de qualquer lib; casa com o plugin do Compose.
 kotlin = "2.4.20"
 coreKtx = "1.17.0"
 lifecycle = "2.9.4"
 activityCompose = "1.13.0"
-composeBom = "2026.09.00"
+# Compose BOM da mesma epoca do AGP 9.0 (compileSdk 36; versoes 2026.09+ exigem 37).
+composeBom = "2026.06.00"
 navigationCompose = "2.9.8"
 splashscreen = "1.2.0"
 datastore = "1.2.1"
 coroutines = "1.11.0"
-retrofit = "3.0.0"
-okhttp = "5.5.0"
-coil = "3.6.3"
+# Retrofit 2 + OkHttp 4: minCompileSdk baixo, compativel com compileSdk 36.
+retrofit = "2.11.0"
+okhttp = "4.12.0"
+# Coil 2 (nao o 3): minCompileSdk baixo, rede via OkHttp embutida.
+coil = "2.7.0"
 materialIconsExtended = "1.7.8"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -47,9 +51,8 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = 
 retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 
-# Image loading
-coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
-coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
+# Image loading (Coil 2)
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 # Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
