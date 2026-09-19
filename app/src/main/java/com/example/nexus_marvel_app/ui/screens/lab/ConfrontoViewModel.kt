@@ -34,7 +34,8 @@ class ConfrontoViewModel(private val repo: ComicVineRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 val page = repo.getCharacters(query = "", offset = 0, limit = 40)
-                val pool = page.items.filter { it.isMarvelOrUnknown }.take(24)
+                val f = page.items.filter { it.isMarvelOrUnknown }
+                val pool = (if (f.isEmpty()) page.items else f).take(24)
                 _uiState.update { it.copy(loading = false, pool = pool, error = null) }
             } catch (e: ComicVineException) {
                 _uiState.update { it.copy(loading = false, error = e.message) }

@@ -33,7 +33,8 @@ class ThanosViewModel(private val repo: ComicVineRepository) : ViewModel() {
         viewModelScope.launch {
             try {
                 val page = repo.getCharacters(query = "", offset = 0, limit = 30)
-                val pool = page.items.filter { it.isMarvelOrUnknown }.take(20)
+                val f = page.items.filter { it.isMarvelOrUnknown }
+                val pool = (if (f.isEmpty()) page.items else f).take(20)
                 _uiState.update { it.copy(loading = false, pool = pool, snappedIds = emptySet(), snapped = false, error = null) }
             } catch (e: ComicVineException) {
                 _uiState.update { it.copy(loading = false, error = e.message) }

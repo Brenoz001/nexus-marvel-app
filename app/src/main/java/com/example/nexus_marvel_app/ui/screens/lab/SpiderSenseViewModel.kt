@@ -32,7 +32,8 @@ class SpiderSenseViewModel(private val repo: ComicVineRepository) : ViewModel() 
         viewModelScope.launch {
             try {
                 val page = repo.getCharacters(query = "", offset = 0, limit = 40)
-                val pool = page.items.filter { it.isMarvelOrUnknown }
+                val f = page.items.filter { it.isMarvelOrUnknown }
+                val pool = if (f.isEmpty()) page.items else f
                 _uiState.update { it.copy(loading = false, pool = pool, error = null) }
             } catch (e: ComicVineException) {
                 _uiState.update { it.copy(loading = false, error = e.message) }

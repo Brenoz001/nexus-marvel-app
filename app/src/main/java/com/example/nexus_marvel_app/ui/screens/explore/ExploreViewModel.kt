@@ -155,7 +155,9 @@ class ExploreViewModel(private val repo: ComicVineRepository) : ViewModel() {
         return when (filter.mode) {
             ExploreMode.TEAMS -> {
                 val page = repo.getTeams(offset)
-                val filtered = page.items.filter { it.isMarvelOrUnknown }
+                val marvel = page.items.filter { it.isMarvelOrUnknown }
+                // Never blank the screen: if the publisher filter empties the page, show all.
+                val filtered = if (marvel.isEmpty()) page.items else marvel
                 Triple(filtered, page.total, page.items.size)
             }
             ExploreMode.POWERS -> {
@@ -164,9 +166,9 @@ class ExploreViewModel(private val repo: ComicVineRepository) : ViewModel() {
             }
             ExploreMode.CHARACTERS -> {
                 val page = repo.getCharacters(query, offset)
-                val filtered = page.items
-                    .filter { it.isMarvelOrUnknown }
-                    .filter { c -> matchesAlignment(c, filter) }
+                val aligned = page.items.filter { c -> matchesAlignment(c, filter) }
+                val marvel = aligned.filter { it.isMarvelOrUnknown }
+                val filtered = if (marvel.isEmpty()) aligned else marvel
                 Triple(filtered, page.total, page.items.size)
             }
         }
