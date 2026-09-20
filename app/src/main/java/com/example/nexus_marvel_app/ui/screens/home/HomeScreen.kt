@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,11 +32,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -137,21 +141,10 @@ private fun PlanetBody(
         modifier = modifier.width(size).graphicsLayer { this.alpha = alpha },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(
-            modifier = Modifier
-                .size(size)
-                .clip(CircleShape)
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(
-                            planet.color,
-                            planet.color.copy(alpha = 0.55f),
-                            Color.Black.copy(alpha = 0.6f),
-                        ),
-                    )
-                )
-                .border(1.dp, planet.color.copy(alpha = 0.7f), CircleShape)
-                .clickable(onClick = onClick),
+        PlanetSphere(
+            planet = planet,
+            diameter = size,
+            modifier = Modifier.clickable(onClick = onClick),
         )
         Text(
             planet.name.uppercase(),
@@ -161,6 +154,61 @@ private fun PlanetBody(
             color = NexusColors.TextPrimary,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 6.dp),
+        )
+    }
+}
+
+/** A real planet photo shaded as a 3D sphere with an atmospheric glow. */
+@Composable
+fun PlanetSphere(
+    planet: Planet,
+    diameter: Dp,
+    modifier: Modifier = Modifier,
+) {
+    val glow = planet.color
+    Box(
+        modifier = modifier
+            .size(diameter)
+            // Atmospheric glow bleeds beyond the disc without affecting layout.
+            .drawBehind {
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(glow.copy(alpha = 0.40f), glow.copy(alpha = 0.10f), Color.Transparent),
+                        center = center,
+                        radius = size.minDimension * 0.85f,
+                    ),
+                    radius = size.minDimension * 0.85f,
+                )
+            }
+            .clip(CircleShape)
+            .border(1.dp, glow.copy(alpha = 0.55f), CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            painter = painterResource(planet.imageRes),
+            contentDescription = planet.name,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize().clip(CircleShape),
+        )
+        // Spherical shading: light from top-left, shadow toward bottom-right.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(CircleShape)
+                .drawBehind {
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.16f),
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.34f),
+                                Color.Black.copy(alpha = 0.70f),
+                            ),
+                            center = Offset(size.width * 0.32f, size.height * 0.30f),
+                            radius = size.minDimension * 0.92f,
+                        ),
+                    )
+                },
         )
     }
 }

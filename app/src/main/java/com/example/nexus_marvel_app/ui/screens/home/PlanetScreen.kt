@@ -10,7 +10,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -115,14 +114,11 @@ private fun OrbitField(planet: Planet, heroes: List<Character>, onCharacterClick
                 .clip(CircleShape)
                 .background(Brush.radialGradient(listOf(planet.color.copy(alpha = 0.18f), Color.Transparent))),
         )
-        // Planet
-        Box(
-            modifier = Modifier
-                .size(128.dp)
-                .scale(pulse)
-                .clip(CircleShape)
-                .background(Brush.radialGradient(listOf(planet.color, planet.color.copy(alpha = 0.5f), Color.Black.copy(alpha = 0.6f))))
-                .border(1.dp, planet.color.copy(alpha = 0.7f), CircleShape),
+        // Planet — real photo shaded as a sphere
+        PlanetSphere(
+            planet = planet,
+            diameter = 128.dp,
+            modifier = Modifier.scale(pulse),
         )
 
         // Heroes orbiting
