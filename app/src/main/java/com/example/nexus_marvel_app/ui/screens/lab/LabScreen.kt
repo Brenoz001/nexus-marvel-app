@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BackHand
+import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Hub
@@ -52,6 +53,7 @@ private data class LabFeature(
 @Composable
 fun LabScreen(contentPadding: PaddingValues, onOpen: (String) -> Unit) {
     val features = listOf(
+        LabFeature("Forje seu Herói", "Crie sua identidade: origem, poderes e emblema.", Icons.Filled.Badge, NexusColors.Gold, Routes.LAB_FORGE),
         LabFeature("Constelações", "O grafo de heróis conectados por time.", Icons.Filled.Hub, NexusColors.Red, Routes.LAB_CONSTELLATION),
         LabFeature("Confronto", "Poder vs poder num radar sobreposto.", Icons.Filled.Bolt, NexusColors.Red, Routes.LAB_CONFRONTO),
         LabFeature("Multiverso", "Encontre todas as variantes de um herói.", Icons.Filled.BlurOn, NexusColors.Info, Routes.LAB_MULTIVERSO),

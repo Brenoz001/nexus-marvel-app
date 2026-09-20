@@ -28,6 +28,7 @@ object Routes {
     const val LAB_SNAP = "lab/snap"
     const val LAB_JUKEBOX = "lab/jukebox"
     const val LAB_CONSTELLATION = "lab/constellation"
+    const val LAB_FORGE = "lab/forge"
 
     fun character(id: Int) = "character/$id"
     fun team(id: Int) = "team/$id"

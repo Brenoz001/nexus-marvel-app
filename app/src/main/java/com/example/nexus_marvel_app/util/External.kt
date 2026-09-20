@@ -19,3 +19,14 @@ fun openUrl(context: Context, url: String) {
         context.startActivity(intent)
     }
 }
+
+/** Opens the Android share sheet with a block of text. Safe no-op on failure. */
+fun shareText(context: Context, text: String, title: String = "Compartilhar") {
+    runCatching {
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        context.startActivity(Intent.createChooser(send, title).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+}
