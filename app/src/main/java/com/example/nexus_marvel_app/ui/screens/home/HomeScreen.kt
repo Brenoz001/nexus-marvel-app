@@ -169,19 +169,24 @@ fun PlanetSphere(
     Box(
         modifier = modifier
             .size(diameter)
-            // Atmospheric glow bleeds beyond the disc without affecting layout.
+            // Soft atmospheric rim glow that hugs the disc and fades out cleanly.
             .drawBehind {
+                val r = size.minDimension
                 drawCircle(
                     brush = Brush.radialGradient(
-                        colors = listOf(glow.copy(alpha = 0.40f), glow.copy(alpha = 0.10f), Color.Transparent),
+                        colorStops = arrayOf(
+                            0.50f to Color.Transparent,
+                            0.60f to glow.copy(alpha = 0.28f),
+                            0.85f to Color.Transparent,
+                        ),
                         center = center,
-                        radius = size.minDimension * 0.85f,
+                        radius = r,
                     ),
-                    radius = size.minDimension * 0.85f,
+                    radius = r,
                 )
             }
             .clip(CircleShape)
-            .border(1.dp, glow.copy(alpha = 0.55f), CircleShape),
+            .border(1.dp, glow.copy(alpha = 0.45f), CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Image(
@@ -190,7 +195,7 @@ fun PlanetSphere(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize().clip(CircleShape),
         )
-        // Spherical shading: light from top-left, shadow toward bottom-right.
+        // Spherical shading: gentle highlight top-left, soft terminator bottom-right.
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -198,14 +203,14 @@ fun PlanetSphere(
                 .drawBehind {
                     drawCircle(
                         brush = Brush.radialGradient(
-                            colors = listOf(
-                                Color.White.copy(alpha = 0.16f),
-                                Color.Transparent,
-                                Color.Black.copy(alpha = 0.34f),
-                                Color.Black.copy(alpha = 0.70f),
+                            colorStops = arrayOf(
+                                0.0f to Color.White.copy(alpha = 0.12f),
+                                0.45f to Color.Transparent,
+                                0.80f to Color.Black.copy(alpha = 0.28f),
+                                1.0f to Color.Black.copy(alpha = 0.55f),
                             ),
-                            center = Offset(size.width * 0.32f, size.height * 0.30f),
-                            radius = size.minDimension * 0.92f,
+                            center = Offset(size.width * 0.34f, size.height * 0.32f),
+                            radius = size.minDimension * 0.95f,
                         ),
                     )
                 },
