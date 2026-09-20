@@ -58,7 +58,7 @@ fun LabScreen(contentPadding: PaddingValues, onOpen: (String) -> Unit) {
         LabFeature("Confronto", "Poder vs poder num radar sobreposto.", Icons.Filled.Bolt, NexusColors.Red, Routes.LAB_CONFRONTO),
         LabFeature("Multiverso", "Encontre todas as variantes de um herói.", Icons.Filled.BlurOn, NexusColors.Info, Routes.LAB_MULTIVERSO),
         LabFeature("Sentido Aranha", "Chacoalhe para detectar uma ameaça.", Icons.Filled.Vibration, NexusColors.Gold, Routes.LAB_SPIDER),
-        LabFeature("Efeito Thanos", "Estale os dedos. Metade se desfaz.", Icons.Filled.BackHand, NexusColors.Success, Routes.LAB_SNAP),
+        LabFeature("Manopla do Infinito", "Reúna as 6 Joias e estale. Metade se desfaz.", Icons.Filled.BackHand, NexusColors.Success, Routes.LAB_SNAP),
         LabFeature("Trilha Sonora", "As músicas mais marcantes dos filmes.", Icons.Filled.QueueMusic, NexusColors.Gold, Routes.LAB_JUKEBOX),
     )
 
