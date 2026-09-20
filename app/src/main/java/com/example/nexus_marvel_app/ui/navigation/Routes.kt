@@ -19,6 +19,7 @@ object Routes {
     const val CHARACTER = "character/{id}"
     const val TEAM = "team/{id}"
     const val ARC = "arc/{id}"
+    const val PLANET = "planet/{index}"
 
     // Laboratório
     const val LAB_CONFRONTO = "lab/confronto"
@@ -31,6 +32,7 @@ object Routes {
     fun character(id: Int) = "character/$id"
     fun team(id: Int) = "team/$id"
     fun arc(id: Int) = "arc/$id"
+    fun planet(index: Int) = "planet/$index"
 }
 
 data class TabItem(

@@ -3,6 +3,7 @@ package com.example.nexus_marvel_app.ui
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import com.example.nexus_marvel_app.ui.screens.arcs.ArcsScreen
 import com.example.nexus_marvel_app.ui.screens.character.CharacterDetailScreen
 import com.example.nexus_marvel_app.ui.screens.explore.ExploreScreen
 import com.example.nexus_marvel_app.ui.screens.home.HomeScreen
+import com.example.nexus_marvel_app.ui.screens.home.PlanetScreen
 import com.example.nexus_marvel_app.ui.screens.lab.LabScreen
 import com.example.nexus_marvel_app.ui.screens.lab.ConfrontoScreen
 import com.example.nexus_marvel_app.ui.screens.lab.JukeboxScreen
@@ -87,7 +89,7 @@ fun NexusApp() {
                 composable(Routes.HOME) {
                     HomeScreen(
                         contentPadding = innerPadding,
-                        onCharacterClick = { navController.navigate(Routes.character(it)) },
+                        onPlanetClick = { navController.navigate(Routes.planet(it)) },
                     )
                 }
                 composable(Routes.EXPLORE) {
@@ -164,6 +166,18 @@ fun NexusApp() {
                 ) { entry ->
                     ArcDetailScreen(
                         arcId = entry.arguments?.getInt("id") ?: 0,
+                        onBack = { navController.popBackStack() },
+                        onCharacterClick = { navController.navigate(Routes.character(it)) },
+                    )
+                }
+                composable(
+                    route = Routes.PLANET,
+                    arguments = listOf(navArgument("index") { type = NavType.IntType }),
+                    enterTransition = { fadeIn(tween(350)) + scaleIn(initialScale = 0.85f, animationSpec = tween(350)) },
+                    exitTransition = { fadeOut(tween(250)) },
+                ) { entry ->
+                    PlanetScreen(
+                        planetIndex = entry.arguments?.getInt("index") ?: 0,
                         onBack = { navController.popBackStack() },
                         onCharacterClick = { navController.navigate(Routes.character(it)) },
                     )
