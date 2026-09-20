@@ -39,7 +39,15 @@ import com.example.nexus_marvel_app.ui.components.ErrorState
 import com.example.nexus_marvel_app.ui.components.NexusBadge
 import com.example.nexus_marvel_app.ui.theme.NexusColors
 import com.example.nexus_marvel_app.ui.theme.Spacing
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.example.nexus_marvel_app.ui.theme.JetBrainsMono
+import com.example.nexus_marvel_app.ui.theme.Radius
+import com.example.nexus_marvel_app.util.PowerCategory
 import com.example.nexus_marvel_app.util.computePowerScores
+import com.example.nexus_marvel_app.util.overallRating
 
 private val COLOR_A = NexusColors.Red
 private val COLOR_B = NexusColors.Info
@@ -71,6 +79,7 @@ fun ConfrontoScreen(onBack: () -> Unit) {
                         colorB = COLOR_B,
                         modifier = Modifier.fillMaxWidth().height(300.dp),
                     )
+                    Verdict(state.fighterA!!, state.fighterB!!)
                     Row(modifier = Modifier.fillMaxWidth().padding(top = Spacing.md), horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
                         PowerColumn(state.fighterA!!, COLOR_A, Modifier.weight(1f))
                         PowerColumn(state.fighterB!!, COLOR_B, Modifier.weight(1f))
@@ -133,6 +142,50 @@ private fun PowerColumn(fighter: Character, color: androidx.compose.ui.graphics.
                 fighter.powers.take(8).forEach { p -> NexusBadge(label = p.name, color = color, small = true) }
             }
         }
+    }
+}
+
+@Composable
+private fun Verdict(a: Character, b: Character) {
+    val sa = computePowerScores(a.powers)
+    val sb = computePowerScores(b.powers)
+    val ra = overallRating(sa)
+    val rb = overallRating(sb)
+    val winnerName = when { ra > rb -> a.name; rb > ra -> b.name; else -> "Empate técnico" }
+    val winnerColor = when { ra > rb -> COLOR_A; rb > ra -> COLOR_B; else -> NexusColors.Gold }
+    val catsA = PowerCategory.entries.count { (sa[it] ?: 0) > (sb[it] ?: 0) }
+    val catsB = PowerCategory.entries.count { (sb[it] ?: 0) > (sa[it] ?: 0) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = Spacing.md)
+            .clip(RoundedCornerShape(Radius.lg))
+            .background(NexusColors.Surface)
+            .border(1.dp, winnerColor.copy(alpha = 0.4f), RoundedCornerShape(Radius.lg))
+            .padding(Spacing.md),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
+        Text("VEREDITO", color = NexusColors.TextMuted, fontSize = 11.sp, letterSpacing = 1.sp, fontWeight = FontWeight.SemiBold)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.lg)) {
+            RatingBlock(ra, a.name, COLOR_A)
+            Text("VS", color = NexusColors.TextSecondary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            RatingBlock(rb, b.name, COLOR_B)
+        }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            Icon(Icons.Filled.EmojiEvents, contentDescription = null, tint = winnerColor, modifier = Modifier.size(20.dp))
+            Text("Vencedor: $winnerName", color = winnerColor, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        }
+        Text("$catsA × $catsB nas categorias", color = NexusColors.TextSecondary, fontSize = 12.sp)
+    }
+}
+
+@Composable
+private fun RatingBlock(rating: Double, name: String, color: androidx.compose.ui.graphics.Color) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(rating.toString(), color = color, fontFamily = JetBrainsMono, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+        Text(name, color = NexusColors.TextSecondary, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 

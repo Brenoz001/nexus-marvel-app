@@ -51,11 +51,23 @@ class ConfrontoViewModel(private val repo: ComicVineRepository) : ViewModel() {
     fun setActiveSlot(slot: Int) = _uiState.update { it.copy(activeSlot = slot) }
 
     fun pick(character: Character) {
+        // Show the pick immediately (image/name), then load full detail for powers.
         _uiState.update { state ->
-            if (state.activeSlot == 0) {
-                state.copy(fighterA = character, activeSlot = 1)
-            } else {
-                state.copy(fighterB = character, activeSlot = 0)
+            if (state.activeSlot == 0) state.copy(fighterA = character, activeSlot = 1)
+            else state.copy(fighterB = character, activeSlot = 0)
+        }
+        viewModelScope.launch {
+            val full = try {
+                repo.getCharacter(character.id)
+            } catch (e: ComicVineException) {
+                return@launch // keep the basic version if detail fails
+            }
+            _uiState.update { st ->
+                when (character.id) {
+                    st.fighterA?.id -> st.copy(fighterA = full)
+                    st.fighterB?.id -> st.copy(fighterB = full)
+                    else -> st
+                }
             }
         }
     }
