@@ -55,7 +55,7 @@ fun LabScreen(contentPadding: PaddingValues, onOpen: (String) -> Unit) {
     val features = listOf(
         LabFeature("Forje seu Herói", "Crie sua identidade: origem, poderes e emblema.", Icons.Filled.Badge, NexusColors.Gold, Routes.LAB_FORGE),
         LabFeature("Constelações", "O grafo de heróis conectados por time.", Icons.Filled.Hub, NexusColors.Red, Routes.LAB_CONSTELLATION),
-        LabFeature("Confronto", "Poder vs poder num radar sobreposto.", Icons.Filled.Bolt, NexusColors.Red, Routes.LAB_CONFRONTO),
+        LabFeature("Confronto", "Radar de poder + batalha por turnos.", Icons.Filled.Bolt, NexusColors.Red, Routes.LAB_CONFRONTO),
         LabFeature("Multiverso", "Encontre todas as variantes de um herói.", Icons.Filled.BlurOn, NexusColors.Info, Routes.LAB_MULTIVERSO),
         LabFeature("Sentido Aranha", "Chacoalhe para detectar uma ameaça.", Icons.Filled.Vibration, NexusColors.Gold, Routes.LAB_SPIDER),
         LabFeature("Manopla do Infinito", "Reúna as 6 Joias e estale. Metade se desfaz.", Icons.Filled.BackHand, NexusColors.Success, Routes.LAB_SNAP),
