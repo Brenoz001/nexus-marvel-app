@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BackHand
 import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.QueueMusic
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -51,6 +52,7 @@ private data class LabFeature(
 @Composable
 fun LabScreen(contentPadding: PaddingValues, onOpen: (String) -> Unit) {
     val features = listOf(
+        LabFeature("Cosmos", "Viaje pelos planetas e seus heróis.", Icons.Filled.Public, NexusColors.Info, Routes.LAB_COSMOS),
         LabFeature("Confronto", "Poder vs poder num radar sobreposto.", Icons.Filled.Bolt, NexusColors.Red, Routes.LAB_CONFRONTO),
         LabFeature("Multiverso", "Encontre todas as variantes de um herói.", Icons.Filled.BlurOn, NexusColors.Info, Routes.LAB_MULTIVERSO),
         LabFeature("Sentido Aranha", "Chacoalhe para detectar uma ameaça.", Icons.Filled.Vibration, NexusColors.Gold, Routes.LAB_SPIDER),

@@ -87,11 +87,22 @@ fun SnapScreen(onBack: () -> Unit) {
                         verticalArrangement = Arrangement.spacedBy(Spacing.md),
                     ) {
                         if (state.snapped) {
+                            val survivors = state.pool.count { it.id !in state.snappedIds }
+                            val thanos = state.pool.firstOrNull { it.name.contains("Thanos", ignoreCase = true) }
+                            thanos?.let {
+                                LabAvatar(url = it.imageMedium, size = 76.dp, ringColor = NexusColors.Gold, ringWidth = 3.dp, contentDescription = "Thanos")
+                            }
                             Text(
                                 "\"Perfeitamente equilibrado, como tudo deveria ser.\"",
                                 color = NexusColors.TextSecondary,
                                 fontSize = 14.sp,
                                 textAlign = TextAlign.Center,
+                            )
+                            Text(
+                                "$survivors de ${state.pool.size} sobreviveram ao estalo",
+                                color = NexusColors.Success,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
                             )
                             ActionButton("REVERTER", NexusColors.Success) { vm.revert() }
                         } else {

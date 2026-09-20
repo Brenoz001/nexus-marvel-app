@@ -38,6 +38,7 @@ import com.example.nexus_marvel_app.ui.screens.home.HomeScreen
 import com.example.nexus_marvel_app.ui.screens.lab.LabScreen
 import com.example.nexus_marvel_app.ui.screens.lab.ConfrontoScreen
 import com.example.nexus_marvel_app.ui.screens.lab.JukeboxScreen
+import com.example.nexus_marvel_app.ui.screens.lab.CosmosScreen
 import com.example.nexus_marvel_app.ui.screens.lab.MultiversoScreen
 import com.example.nexus_marvel_app.ui.screens.lab.SnapScreen
 import com.example.nexus_marvel_app.ui.screens.lab.SpiderSenseScreen
@@ -125,6 +126,12 @@ fun NexusApp() {
                 }
                 composable(Routes.LAB_JUKEBOX) {
                     JukeboxScreen(onBack = { navController.popBackStack() })
+                }
+                composable(Routes.LAB_COSMOS) {
+                    CosmosScreen(
+                        onBack = { navController.popBackStack() },
+                        onCharacterClick = { navController.navigate(Routes.character(it)) },
+                    )
                 }
 
                 composable(
