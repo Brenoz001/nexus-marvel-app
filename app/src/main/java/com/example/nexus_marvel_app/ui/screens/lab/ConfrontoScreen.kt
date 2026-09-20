@@ -1,11 +1,7 @@
 package com.example.nexus_marvel_app.ui.screens.lab
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -397,12 +393,8 @@ private fun FighterPanel(name: String, url: String?, hp: Int, max: Int, color: C
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
         Box(contentAlignment = Alignment.TopCenter) {
             LabAvatar(url = url, size = 76.dp, ringColor = color, ringWidth = 2.5.dp, contentDescription = name)
-            AnimatedVisibility(
-                visible = pop != null,
-                enter = fadeIn(tween(120)) + slideInVertically(tween(200)) { it / 2 },
-                exit = fadeOut(tween(300)),
-            ) {
-                Text(pop?.first ?: "", color = pop?.second ?: Color.White, fontFamily = BebasNeue, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+            if (pop != null) {
+                Text(pop.first, color = pop.second, fontFamily = BebasNeue, fontSize = 26.sp, fontWeight = FontWeight.Bold)
             }
         }
         Text(name, color = NexusColors.TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
