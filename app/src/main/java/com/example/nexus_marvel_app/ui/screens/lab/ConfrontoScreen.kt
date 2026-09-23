@@ -1,5 +1,7 @@
 package com.example.nexus_marvel_app.ui.screens.lab
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -30,11 +32,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,6 +66,7 @@ import com.example.nexus_marvel_app.util.computePowerScores
 import com.example.nexus_marvel_app.util.overallRating
 import kotlin.random.Random
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private val COLOR_A = NexusColors.Red
 private val COLOR_B = NexusColors.Info
@@ -287,75 +293,140 @@ private fun BattleArena(a: Character, b: Character, onExit: () -> Unit) {
     var log by remember(a.id, b.id) { mutableStateOf(listOf("A batalha começou! ${a.name} enfrenta ${b.name}.")) }
     var popA by remember(a.id, b.id) { mutableStateOf<Pair<String, Color>?>(null) }
     var popB by remember(a.id, b.id) { mutableStateOf<Pair<String, Color>?>(null) }
+    var animating by remember(a.id, b.id) { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+    val density = LocalDensity.current
+    val lungePx = with(density) { 72.dp.toPx() }
+    val offPx = with(density) { 280.dp.toPx() }
+
+    // Animation drivers (px offsets / 0..1 progress)
+    val entranceA = remember(a.id, b.id) { Animatable(0f) }
+    val entranceB = remember(a.id, b.id) { Animatable(0f) }
+    val lungeA = remember(a.id, b.id) { Animatable(0f) }
+    val lungeB = remember(a.id, b.id) { Animatable(0f) }
+    val shakeA = remember(a.id, b.id) { Animatable(0f) }
+    val shakeB = remember(a.id, b.id) { Animatable(0f) }
+    val flashA = remember(a.id, b.id) { Animatable(0f) }
+    val flashB = remember(a.id, b.id) { Animatable(0f) }
+    val koA = remember(a.id, b.id) { Animatable(0f) }
+    val koB = remember(a.id, b.id) { Animatable(0f) }
+    val quake = remember(a.id, b.id) { Animatable(0f) }
 
     fun pushLog(line: String) { log = (log + line).takeLast(6) }
 
-    fun applyMove(move: Move, byA: Boolean) {
-        val attackerName = if (byA) a.name else b.name
+    suspend fun impact(onDefenderA: Boolean, crit: Boolean) {
+        val shake = if (onDefenderA) shakeA else shakeB
+        val flash = if (onDefenderA) flashA else flashB
+        flash.snapTo(0.6f)
+        scope.launch { flash.animateTo(0f, tween(340)) }
+        scope.launch {
+            repeat(3) { shake.animateTo(14f, tween(40)); shake.animateTo(-14f, tween(40)) }
+            shake.animateTo(0f, tween(40))
+        }
+        if (crit) scope.launch {
+            repeat(4) { quake.animateTo(12f, tween(32)); quake.animateTo(-12f, tween(32)) }
+            quake.animateTo(0f, tween(32))
+        }
+    }
+
+    suspend fun takeTurn(move: Move, byA: Boolean) {
+        animating = true
         val atkScores = if (byA) scoresA else scoresB
         val defScores = if (byA) scoresB else scoresA
-        if (move.kind == MoveKind.GUARD) {
-            val heal = healOf(atkScores)
-            if (byA) { hpA = (hpA + heal).coerceAtMost(maxA); popA = "+$heal" to NexusColors.Success }
-            else { hpB = (hpB + heal).coerceAtMost(maxB); popB = "+$heal" to NexusColors.Success }
-            pushLog("$attackerName usa ${move.name} e recupera $heal de vida.")
-        } else {
+        val attacker = if (byA) a.name else b.name
+        if (move.kind == MoveKind.ATTACK) {
+            val lunge = if (byA) lungeA else lungeB
+            lunge.animateTo(1f, tween(150, easing = FastOutSlowInEasing))
             val (dmg, crit) = damageOf(atkScores, defScores, move.category)
             if (byA) { hpB = (hpB - dmg).coerceAtLeast(0); popB = "-$dmg" to NexusColors.RedLight }
             else { hpA = (hpA - dmg).coerceAtLeast(0); popA = "-$dmg" to NexusColors.RedLight }
-            pushLog("$attackerName usa ${move.name} e causa $dmg${if (crit) " (CRÍTICO!)" else ""} de dano.")
+            pushLog("$attacker usa ${move.name} e causa $dmg${if (crit) " (CRÍTICO!)" else ""} de dano.")
+            impact(onDefenderA = !byA, crit = crit)
+            lunge.animateTo(0f, tween(240))
+        } else {
+            val heal = healOf(atkScores)
+            if (byA) { hpA = (hpA + heal).coerceAtMost(maxA); popA = "+$heal" to NexusColors.Success }
+            else { hpB = (hpB + heal).coerceAtMost(maxB); popB = "+$heal" to NexusColors.Success }
+            pushLog("$attacker usa ${move.name} e recupera $heal de vida.")
+            val self = if (byA) lungeA else lungeB
+            self.animateTo(-0.35f, tween(160)); self.animateTo(0f, tween(220))
         }
-        val targetDead = if (byA) hpB <= 0 else hpA <= 0
-        when {
-            targetDead -> {
-                winner = attackerName
-                turn = Turn.OVER
-                pushLog("$attackerName venceu o confronto!")
-            }
-            else -> turn = if (byA) Turn.ENEMY else Turn.PLAYER
+        val dead = if (byA) hpB <= 0 else hpA <= 0
+        if (dead) {
+            winner = attacker
+            scope.launch { repeat(4) { quake.animateTo(12f, tween(32)); quake.animateTo(-12f, tween(32)) }; quake.animateTo(0f, tween(32)) }
+            (if (byA) koB else koA).animateTo(1f, tween(650, easing = FastOutSlowInEasing))
+            pushLog("$attacker venceu o confronto!")
+            turn = Turn.OVER
+        } else {
+            turn = if (byA) Turn.ENEMY else Turn.PLAYER
         }
+        animating = false
     }
 
+    // Entrance slide-in
+    LaunchedEffect(a.id, b.id) {
+        entranceA.snapTo(0f); entranceB.snapTo(0f)
+        scope.launch { entranceA.animateTo(1f, tween(520, easing = FastOutSlowInEasing)) }
+        entranceB.animateTo(1f, tween(520, easing = FastOutSlowInEasing))
+    }
     // Enemy AI turn
     LaunchedEffect(turn) {
         if (turn == Turn.ENEMY && winner == null) {
-            delay(850)
+            delay(650)
             val guard = movesB.firstOrNull { it.kind == MoveKind.GUARD }
-            val move = if (guard != null && hpB < maxB * 0.3f && Random.nextInt(100) < 60) {
-                guard
-            } else {
-                movesB.filter { it.kind == MoveKind.ATTACK }.ifEmpty { movesB }.random()
-            }
-            applyMove(move, byA = false)
+            val move = if (guard != null && hpB < maxB * 0.3f && Random.nextInt(100) < 60) guard
+                else movesB.filter { it.kind == MoveKind.ATTACK }.ifEmpty { movesB }.random()
+            takeTurn(move, byA = false)
         }
     }
     // Clear damage popups
-    LaunchedEffect(popA) { if (popA != null) { delay(900); popA = null } }
-    LaunchedEffect(popB) { if (popB != null) { delay(900); popB = null } }
+    LaunchedEffect(popA) { if (popA != null) { delay(950); popA = null } }
+    LaunchedEffect(popB) { if (popB != null) { delay(950); popB = null } }
 
-    Column(modifier = Modifier.fillMaxSize().padding(horizontal = Spacing.md)) {
-        // Fighters + HP
-        Row(modifier = Modifier.fillMaxWidth().padding(top = Spacing.sm), verticalAlignment = Alignment.Top) {
-            FighterPanel(a.name, a.imageMedium, hpA, maxA, COLOR_A, popA, Modifier.weight(1f))
-            Text("VS", color = NexusColors.TextPrimary, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(horizontal = Spacing.sm, vertical = Spacing.xl))
-            FighterPanel(b.name, b.imageMedium, hpB, maxB, COLOR_B, popB, Modifier.weight(1f))
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .graphicsLayer { translationX = quake.value }
+            .padding(horizontal = Spacing.md),
+    ) {
+        // HP headers
+        Row(modifier = Modifier.fillMaxWidth().padding(top = Spacing.sm), horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+            HpHeader(a.name, hpA, maxA, COLOR_A, Modifier.weight(1f))
+            HpHeader(b.name, hpB, maxB, COLOR_B, Modifier.weight(1f))
         }
 
-        // Battle log
+        // Fighting stage
+        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            Text("VS", modifier = Modifier.align(Alignment.Center), color = NexusColors.TextPrimary.copy(alpha = 0.45f), fontFamily = BebasNeue, fontSize = 44.sp)
+            Fighter(
+                url = a.imageMedium, name = a.name, ring = COLOR_A, pop = popA,
+                modifier = Modifier.align(Alignment.CenterStart),
+                translationX = -(1f - entranceA.value) * offPx + lungeA.value * lungePx + shakeA.value,
+                flash = flashA.value, ko = koA.value, koDir = -1f,
+            )
+            Fighter(
+                url = b.imageMedium, name = b.name, ring = COLOR_B, pop = popB,
+                modifier = Modifier.align(Alignment.CenterEnd),
+                translationX = (1f - entranceB.value) * offPx - lungeB.value * lungePx + shakeB.value,
+                flash = flashB.value, ko = koB.value, koDir = 1f,
+            )
+        }
+
+        // Compact battle log
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = Spacing.md)
+                .padding(top = Spacing.sm)
                 .clip(RoundedCornerShape(Radius.md))
                 .background(NexusColors.Surface)
                 .border(1.dp, NexusColors.Border, RoundedCornerShape(Radius.md))
-                .padding(Spacing.md)
-                .weight(1f)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+                .padding(Spacing.sm),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            log.forEach { line ->
-                Text(line, color = NexusColors.TextSecondary, fontSize = 12.sp, fontFamily = JetBrainsMono)
+            log.takeLast(3).forEach { line ->
+                Text(line, color = NexusColors.TextSecondary, fontSize = 11.sp, fontFamily = JetBrainsMono, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
 
@@ -365,7 +436,11 @@ private fun BattleArena(a: Character, b: Character, onExit: () -> Unit) {
                 Turn.PLAYER -> {
                     Text("SUA VEZ — ${a.name}", color = COLOR_A, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                        movesA.forEach { m -> MoveButton(m, COLOR_A) { applyMove(m, byA = true) } }
+                        movesA.forEach { m ->
+                            MoveButton(m, COLOR_A, enabled = !animating) {
+                                if (turn == Turn.PLAYER && !animating) { animating = true; scope.launch { takeTurn(m, byA = true) } }
+                            }
+                        }
                     }
                 }
                 Turn.ENEMY -> Text("${b.name} está atacando…", color = COLOR_B, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
@@ -378,6 +453,7 @@ private fun BattleArena(a: Character, b: Character, onExit: () -> Unit) {
                         BattleActionButton("REVANCHE", NexusColors.Gold, filled = true, Modifier.weight(1f)) {
                             hpA = maxA; hpB = maxB; winner = null; turn = Turn.PLAYER
                             log = listOf("Revanche! ${a.name} enfrenta ${b.name}.")
+                            scope.launch { koA.snapTo(0f); koB.snapTo(0f) }
                         }
                         BattleActionButton("SAIR", NexusColors.TextSecondary, filled = false, Modifier.weight(1f), onClick = onExit)
                     }
@@ -388,17 +464,13 @@ private fun BattleArena(a: Character, b: Character, onExit: () -> Unit) {
 }
 
 @Composable
-private fun FighterPanel(name: String, url: String?, hp: Int, max: Int, color: Color, pop: Pair<String, Color>?, modifier: Modifier = Modifier) {
+private fun HpHeader(name: String, hp: Int, max: Int, color: Color, modifier: Modifier = Modifier) {
     val frac by animateFloatAsState(targetValue = (hp.toFloat() / max).coerceIn(0f, 1f), animationSpec = tween(450), label = "hp")
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-        Box(contentAlignment = Alignment.TopCenter) {
-            LabAvatar(url = url, size = 76.dp, ringColor = color, ringWidth = 2.5.dp, contentDescription = name)
-            if (pop != null) {
-                Text(pop.first, color = pop.second, fontFamily = BebasNeue, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-            }
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text(name.uppercase(), color = NexusColors.TextPrimary, fontFamily = BebasNeue, fontSize = 15.sp, letterSpacing = 0.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+            Text("$hp/$max", color = color, fontSize = 11.sp, fontFamily = JetBrainsMono)
         }
-        Text(name, color = NexusColors.TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
-        // HP bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -414,21 +486,72 @@ private fun FighterPanel(name: String, url: String?, hp: Int, max: Int, color: C
                     .background(if (frac < 0.3f) NexusColors.Danger else color),
             )
         }
-        Text("$hp / $max", color = NexusColors.TextSecondary, fontSize = 11.sp, fontFamily = JetBrainsMono)
     }
 }
 
 @Composable
-private fun MoveButton(move: Move, color: Color, onClick: () -> Unit) {
+private fun Fighter(
+    url: String?,
+    name: String,
+    ring: Color,
+    pop: Pair<String, Color>?,
+    modifier: Modifier,
+    translationX: Float,
+    flash: Float,
+    ko: Float,
+    koDir: Float,
+) {
+    Column(
+        modifier = modifier.graphicsLayer {
+            this.translationX = translationX
+            translationY = ko * 90f
+            rotationZ = ko * 70f * koDir
+            alpha = 1f - ko * 0.55f
+        },
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        // Reserved slot for the floating damage/heal number
+        Box(modifier = Modifier.height(30.dp), contentAlignment = Alignment.Center) {
+            if (pop != null) {
+                Text(pop.first, color = pop.second, fontFamily = BebasNeue, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+        Box(contentAlignment = Alignment.Center) {
+            LabAvatar(url = url, size = 100.dp, ringColor = ring, ringWidth = 3.dp, contentDescription = name)
+            if (flash > 0.01f) {
+                Box(modifier = Modifier.matchParentSize().clip(CircleShape).background(NexusColors.RedLight.copy(alpha = flash)))
+            }
+            if (flash > 0.2f) {
+                Icon(
+                    Icons.Filled.Bolt,
+                    contentDescription = null,
+                    tint = NexusColors.Gold,
+                    modifier = Modifier
+                        .size(52.dp)
+                        .graphicsLayer {
+                            this.alpha = flash
+                            val s = 1f + (1f - flash) * 0.8f
+                            scaleX = s; scaleY = s
+                        },
+                )
+            }
+        }
+        Text(name, color = NexusColors.TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 4.dp))
+    }
+}
+
+@Composable
+private fun MoveButton(move: Move, color: Color, enabled: Boolean, onClick: () -> Unit) {
+    val bg = if (enabled) color.copy(alpha = 0.16f) else NexusColors.SurfaceLight
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(Radius.md))
-            .background(color.copy(alpha = 0.16f))
-            .border(1.dp, color.copy(alpha = 0.5f), RoundedCornerShape(Radius.md))
-            .clickable(onClick = onClick)
+            .background(bg)
+            .border(1.dp, if (enabled) color.copy(alpha = 0.5f) else NexusColors.Border, RoundedCornerShape(Radius.md))
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(horizontal = Spacing.md, vertical = Spacing.sm),
     ) {
-        Text(move.name, color = NexusColors.TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        Text(move.name, color = if (enabled) NexusColors.TextPrimary else NexusColors.TextMuted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         Text(
             if (move.kind == MoveKind.GUARD) "Defesa • ${move.category.short}" else "Ataque • ${move.category.short}",
             color = NexusColors.TextMuted,
