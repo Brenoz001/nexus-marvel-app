@@ -24,13 +24,17 @@ class CosmosViewModel(private val repo: ComicVineRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(CosmosUiState())
     val uiState = _uiState.asStateFlow()
 
-    init { load() }
+    private var loadedKey: String? = null
 
-    fun load() {
+    /** Load only the characters that belong to a given world (by name). */
+    fun loadFor(names: List<String>) {
+        val key = names.sorted().joinToString(",")
+        if (key == loadedKey && _uiState.value.characters.isNotEmpty()) return
+        loadedKey = key
         _uiState.update { it.copy(loading = true, error = null) }
         viewModelScope.launch {
             try {
-                val chars = repo.getFeaturedCharacters()
+                val chars = repo.getCharactersByNames(names)
                 _uiState.update { it.copy(loading = false, characters = chars, error = null) }
             } catch (e: ComicVineException) {
                 _uiState.update { it.copy(loading = false, error = e.message) }

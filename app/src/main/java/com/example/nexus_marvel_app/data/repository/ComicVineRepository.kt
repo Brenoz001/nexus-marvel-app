@@ -108,6 +108,24 @@ class ComicVineRepository(
             out
         }
 
+    /** Fetch specific Marvel characters by exact name (cached per name-set). */
+    suspend fun getCharactersByNames(names: List<String>): List<Character> {
+        if (names.isEmpty()) return emptyList()
+        val key = "chars_by_name:" + names.sorted().joinToString(",")
+        return call(key) {
+            val out = mutableListOf<Character>()
+            val seen = mutableSetOf<Int>()
+            for (name in names) {
+                try {
+                    val resp = api.getCharacters(limit = 1, offset = 0, filter = "name:$name", fieldList = CHARACTER_FIELDS)
+                    val c = resp.results?.firstOrNull()?.toDomain()
+                    if (c != null && seen.add(c.id)) out.add(c)
+                } catch (_: Exception) { /* skip a missing pick, keep the rest */ }
+            }
+            out
+        }
+    }
+
     /** Curated list of the greatest Marvel story arcs, fetched by name. Cached. */
     suspend fun getFeaturedArcs(): List<StoryArc> =
         call("featured_arcs") {

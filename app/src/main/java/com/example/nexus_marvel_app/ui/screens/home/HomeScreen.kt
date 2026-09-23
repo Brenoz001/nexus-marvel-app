@@ -3,6 +3,7 @@ package com.example.nexus_marvel_app.ui.screens.home
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -10,11 +11,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,8 +24,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +43,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -44,7 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.Text
+import androidx.compose.ui.zIndex
 import com.example.nexus_marvel_app.data.MARVEL_PLANETS
 import com.example.nexus_marvel_app.data.Planet
 import com.example.nexus_marvel_app.ui.components.StarField
@@ -52,65 +59,57 @@ import com.example.nexus_marvel_app.ui.theme.BebasNeue
 import com.example.nexus_marvel_app.ui.theme.NexusColors
 import com.example.nexus_marvel_app.ui.theme.Spacing
 import com.example.nexus_marvel_app.ui.theme.nexusBackground
-import kotlin.math.sin
+import kotlin.math.abs
 
-/** Layout of each planet in the depth field (index matches MARVEL_PLANETS). */
-private data class PlanetPos(val xFrac: Float, val yFrac: Float, val size: Dp, val depth: Float, val phase: Float)
-
-private val LAYOUT = listOf(
-    PlanetPos(0.50f, 0.48f, 132.dp, 1.00f, 0.0f),  // Terra — closest
-    PlanetPos(0.23f, 0.28f, 82.dp, 0.70f, 1.2f),   // Asgard
-    PlanetPos(0.80f, 0.66f, 70.dp, 0.55f, 2.1f),   // Titã
-    PlanetPos(0.82f, 0.30f, 76.dp, 0.62f, 3.0f),   // Cosmos
-    PlanetPos(0.25f, 0.70f, 94.dp, 0.80f, 4.2f),   // Krakoa
-    PlanetPos(0.58f, 0.84f, 58.dp, 0.45f, 5.1f),   // Klyntar
-)
-
+/**
+ * Home = the NEXUS cosmos: Marvel galaxies stacked in depth (a coverflow).
+ * Drag sideways or tap a galaxy to bring it to the front; tap the front one to enter.
+ */
 @Composable
 fun HomeScreen(contentPadding: PaddingValues, onPlanetClick: (Int) -> Unit) {
-    var pan by remember { mutableStateOf(Offset.Zero) }
-    val transition = rememberInfiniteTransition(label = "float")
-    val t by transition.animateFloat(
+    val galaxies = MARVEL_PLANETS
+    val n = galaxies.size
+    var current by remember { mutableStateOf(0) }
+    var drag by remember { mutableStateOf(0f) }
+
+    val infinite = rememberInfiniteTransition(label = "home")
+    val spin by infinite.animateFloat(
         initialValue = 0f,
-        targetValue = (2f * Math.PI).toFloat(),
-        animationSpec = infiniteRepeatable(tween(7000, easing = LinearEasing), RepeatMode.Restart),
-        label = "t",
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(120000, easing = LinearEasing), RepeatMode.Restart),
+        label = "spin",
     )
 
     Box(modifier = Modifier.fillMaxSize().nexusBackground()) {
         StarField(modifier = Modifier.fillMaxSize())
 
-        BoxWithConstraints(
+        // Galaxy stage
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectDragGestures { change, drag ->
-                        pan = Offset(
-                            (pan.x + drag.x).coerceIn(-130f, 130f),
-                            (pan.y + drag.y).coerceIn(-130f, 130f),
-                        )
+                .pointerInput(n) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = { drag = 0f },
+                        onDragCancel = { drag = 0f },
+                    ) { change, delta ->
+                        drag += delta
+                        if (drag <= -55f && current < n - 1) { current++; drag = 0f }
+                        else if (drag >= 55f && current > 0) { current--; drag = 0f }
                         change.consume()
                     }
                 },
+            contentAlignment = Alignment.Center,
         ) {
-            val w = maxWidth
-            val h = maxHeight
-            MARVEL_PLANETS.forEachIndexed { index, planet ->
-                val pos = LAYOUT.getOrElse(index) { LAYOUT.last() }
-                val parallax = 0.25f + pos.depth * 0.6f
-                val bob = sin(t + pos.phase) * (6f + pos.depth * 8f)
-                PlanetBody(
-                    planet = planet,
-                    size = pos.size,
-                    alpha = (0.55f + pos.depth * 0.45f).coerceIn(0f, 1f),
-                    modifier = Modifier
-                        .offset(x = w * pos.xFrac - pos.size / 2, y = h * pos.yFrac - pos.size / 2)
-                        .graphicsLayer {
-                            translationX = pan.x * parallax
-                            translationY = bob + pan.y * parallax
-                        },
-                    onClick = { onPlanetClick(index) },
-                )
+            galaxies.forEachIndexed { index, galaxy ->
+                val rel = index - current
+                if (abs(rel) <= 2) {
+                    GalaxyCard(
+                        galaxy = galaxy,
+                        rel = rel,
+                        spin = spin,
+                        onClick = { if (rel == 0) onPlanetClick(index) else current = index },
+                    )
+                }
             }
         }
 
@@ -124,41 +123,82 @@ fun HomeScreen(contentPadding: PaddingValues, onPlanetClick: (Int) -> Unit) {
                     .height(2.dp)
                     .background(Brush.horizontalGradient(listOf(NexusColors.Gold, NexusColors.Gold.copy(alpha = 0f)))),
             )
-            Text("Arraste para explorar. Toque num mundo.", color = NexusColors.GoldSoft, fontSize = 12.sp, letterSpacing = 0.6.sp, modifier = Modifier.padding(top = 10.dp))
+            Text("Arraste ou toque numa galáxia.", color = NexusColors.GoldSoft, fontSize = 12.sp, letterSpacing = 0.6.sp, modifier = Modifier.padding(top = 10.dp))
+        }
+
+        // Bottom HUD: arrows + galaxy name/realm + dots
+        val g = galaxies[current]
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(bottom = contentPadding.calculateBottomPadding() + Spacing.xl)
+                .padding(horizontal = Spacing.md),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.lg)) {
+                ArrowButton(Icons.Filled.ChevronLeft, enabled = current > 0) { if (current > 0) current-- }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(g.name.uppercase(), fontFamily = BebasNeue, fontSize = 34.sp, letterSpacing = 1.sp, color = NexusColors.TextPrimary, textAlign = TextAlign.Center)
+                    Text(g.realm, color = g.color, fontSize = 12.sp, letterSpacing = 0.5.sp)
+                }
+                ArrowButton(Icons.Filled.ChevronRight, enabled = current < n - 1) { if (current < n - 1) current++ }
+            }
+            // Dots
+            Row(modifier = Modifier.padding(top = Spacing.md), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                galaxies.forEachIndexed { i, _ ->
+                    Box(
+                        modifier = Modifier
+                            .size(if (i == current) 9.dp else 6.dp)
+                            .clip(CircleShape)
+                            .background(if (i == current) g.color else NexusColors.TextMuted),
+                    )
+                }
+            }
+            Text("Toque na galáxia para entrar", color = NexusColors.TextSecondary, fontSize = 11.sp, modifier = Modifier.padding(top = Spacing.sm))
         }
     }
 }
 
 @Composable
-private fun PlanetBody(
-    planet: Planet,
-    size: Dp,
-    alpha: Float,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    Column(
-        modifier = modifier.width(size).graphicsLayer { this.alpha = alpha },
-        horizontalAlignment = Alignment.CenterHorizontally,
+private fun GalaxyCard(galaxy: Planet, rel: Int, spin: Float, onClick: () -> Unit) {
+    val a = abs(rel)
+    val scale by animateFloatAsState((1f - 0.17f * a).coerceAtLeast(0.5f), tween(360), label = "scale")
+    val alpha by animateFloatAsState((1f - 0.32f * a).coerceIn(0f, 1f), tween(360), label = "alpha")
+    val xdp by animateFloatAsState(rel * 98f, tween(360), label = "x")
+
+    Box(
+        modifier = Modifier
+            .offset(x = xdp.dp)
+            .zIndex(10f - a)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                this.alpha = alpha
+                rotationZ = spin
+            }
+            .clickable(onClick = onClick),
     ) {
-        PlanetSphere(
-            planet = planet,
-            diameter = size,
-            modifier = Modifier.clickable(onClick = onClick),
-        )
-        Text(
-            planet.name.uppercase(),
-            fontFamily = BebasNeue,
-            fontSize = 16.sp,
-            letterSpacing = 1.sp,
-            color = NexusColors.TextPrimary,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 6.dp),
-        )
+        PlanetSphere(planet = galaxy, diameter = 176.dp)
     }
 }
 
-/** A real planet photo shaded as a 3D sphere with an atmospheric glow. */
+@Composable
+private fun ArrowButton(icon: ImageVector, enabled: Boolean, onClick: () -> Unit) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(42.dp)
+            .clip(CircleShape)
+            .background(NexusColors.Surface)
+            .border(1.dp, if (enabled) NexusColors.GoldBorder else NexusColors.Border, CircleShape)
+            .clickable(enabled = enabled, onClick = onClick),
+    ) {
+        Icon(icon, contentDescription = null, tint = if (enabled) NexusColors.Gold else NexusColors.TextMuted)
+    }
+}
+
+/** A real galaxy/nebula photo shaded as a luminous disc with an atmospheric glow. */
 @Composable
 fun PlanetSphere(
     planet: Planet,
@@ -176,7 +216,7 @@ fun PlanetSphere(
                     brush = Brush.radialGradient(
                         colorStops = arrayOf(
                             0.50f to Color.Transparent,
-                            0.60f to glow.copy(alpha = 0.28f),
+                            0.60f to glow.copy(alpha = 0.30f),
                             0.85f to Color.Transparent,
                         ),
                         center = center,
@@ -195,7 +235,7 @@ fun PlanetSphere(
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize().clip(CircleShape),
         )
-        // Spherical shading: gentle highlight top-left, soft terminator bottom-right.
+        // Gentle vignette so the disc reads round without looking like a lit planet.
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -204,13 +244,13 @@ fun PlanetSphere(
                     drawCircle(
                         brush = Brush.radialGradient(
                             colorStops = arrayOf(
-                                0.0f to Color.White.copy(alpha = 0.12f),
-                                0.45f to Color.Transparent,
-                                0.80f to Color.Black.copy(alpha = 0.28f),
-                                1.0f to Color.Black.copy(alpha = 0.55f),
+                                0.0f to Color.White.copy(alpha = 0.10f),
+                                0.55f to Color.Transparent,
+                                0.85f to Color.Black.copy(alpha = 0.18f),
+                                1.0f to Color.Black.copy(alpha = 0.42f),
                             ),
-                            center = Offset(size.width * 0.34f, size.height * 0.32f),
-                            radius = size.minDimension * 0.95f,
+                            center = Offset(size.width * 0.36f, size.height * 0.34f),
+                            radius = size.minDimension * 0.98f,
                         ),
                     )
                 },

@@ -60,6 +60,7 @@ fun PlanetScreen(planetIndex: Int, onBack: () -> Unit, onCharacterClick: (Int) -
     val planet = MARVEL_PLANETS.getOrNull(planetIndex) ?: MARVEL_PLANETS.first()
     val vm: CosmosViewModel = viewModel(factory = CosmosViewModel.Factory)
     val state by vm.uiState.collectAsStateWithLifecycle()
+    androidx.compose.runtime.LaunchedEffect(planetIndex) { vm.loadFor(planet.characters) }
 
     Box(modifier = Modifier.fillMaxSize().nexusBackground()) {
         StarField(modifier = Modifier.fillMaxSize())
@@ -89,63 +90,79 @@ fun PlanetScreen(planetIndex: Int, onBack: () -> Unit, onCharacterClick: (Int) -
 
 @Composable
 private fun OrbitField(planet: Planet, heroes: List<Character>, onCharacterClick: (Int) -> Unit) {
-    val density = LocalDensity.current
-    val orbitRadiusPx = with(density) { 132.dp.toPx() }
-
     val transition = rememberInfiniteTransition(label = "orbit")
     val orbit by transition.animateFloat(
         initialValue = 0f,
         targetValue = (2f * Math.PI).toFloat(),
-        animationSpec = infiniteRepeatable(tween(30000, easing = LinearEasing), RepeatMode.Restart),
+        animationSpec = infiniteRepeatable(tween(38000, easing = LinearEasing), RepeatMode.Restart),
         label = "orbitAngle",
     )
     val pulse by transition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.06f,
-        animationSpec = infiniteRepeatable(tween(2200), RepeatMode.Reverse),
+        targetValue = 1.05f,
+        animationSpec = infiniteRepeatable(tween(2400), RepeatMode.Reverse),
         label = "pulse",
     )
+
+    // Spread heroes across concentric rings so a crowded galaxy stays legible.
+    val ring0 = heroes.take(6)
+    val ring1 = heroes.drop(6)
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         // Glow halo
         Box(
             modifier = Modifier
-                .size(220.dp)
+                .size(230.dp)
                 .clip(CircleShape)
                 .background(Brush.radialGradient(listOf(planet.color.copy(alpha = 0.18f), Color.Transparent))),
         )
-        // Planet — real photo shaded as a sphere
+        // Galaxy core — real nebula image
         PlanetSphere(
             planet = planet,
-            diameter = 128.dp,
+            diameter = 120.dp,
             modifier = Modifier.scale(pulse),
         )
 
-        // Heroes orbiting
-        val n = heroes.size.coerceAtLeast(1)
-        heroes.forEachIndexed { i, hero ->
-            val entrance = remember(hero.id) { Animatable(0f) }
-            androidx.compose.runtime.LaunchedEffect(hero.id) {
-                kotlinx.coroutines.delay(i * 90L)
-                entrance.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow))
-            }
-            val angle = (2.0 * Math.PI * i / n).toFloat() + orbit
-            val dx = orbitRadiusPx * cos(angle)
-            val dy = orbitRadiusPx * sin(angle)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .offset { IntOffset(dx.roundToInt(), dy.roundToInt()) }
-                    .graphicsLayer {
-                        scaleX = entrance.value
-                        scaleY = entrance.value
-                        alpha = entrance.value
-                    }
-                    .clip(CircleShape)
-                    .clickable { onCharacterClick(hero.id) },
-            ) {
-                LabAvatar(url = hero.imageMedium, size = 54.dp, ringColor = planet.color, contentDescription = hero.name)
-            }
+        OrbitRing(heroes = ring0, radiusDp = 92.dp, orbit = orbit, direction = 1f, avatar = 50.dp, planet = planet, startIndex = 0, onCharacterClick = onCharacterClick)
+        OrbitRing(heroes = ring1, radiusDp = 150.dp, orbit = orbit, direction = -1f, avatar = 44.dp, planet = planet, startIndex = ring0.size, onCharacterClick = onCharacterClick)
+    }
+}
+
+@Composable
+private fun OrbitRing(
+    heroes: List<Character>,
+    radiusDp: androidx.compose.ui.unit.Dp,
+    orbit: Float,
+    direction: Float,
+    avatar: androidx.compose.ui.unit.Dp,
+    planet: Planet,
+    startIndex: Int,
+    onCharacterClick: (Int) -> Unit,
+) {
+    val density = LocalDensity.current
+    val rPx = with(density) { radiusDp.toPx() }
+    val n = heroes.size.coerceAtLeast(1)
+    heroes.forEachIndexed { i, hero ->
+        val entrance = remember(hero.id) { Animatable(0f) }
+        androidx.compose.runtime.LaunchedEffect(hero.id) {
+            kotlinx.coroutines.delay((startIndex + i) * 60L)
+            entrance.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow))
+        }
+        val angle = (2.0 * Math.PI * i / n).toFloat() + orbit * direction
+        val dx = rPx * cos(angle)
+        val dy = rPx * sin(angle)
+        Box(
+            modifier = Modifier
+                .offset { IntOffset(dx.roundToInt(), dy.roundToInt()) }
+                .graphicsLayer {
+                    scaleX = entrance.value
+                    scaleY = entrance.value
+                    alpha = entrance.value
+                }
+                .clip(CircleShape)
+                .clickable { onCharacterClick(hero.id) },
+        ) {
+            LabAvatar(url = hero.imageMedium, size = avatar, ringColor = planet.color, contentDescription = hero.name)
         }
     }
 }
